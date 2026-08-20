@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Equipeças Rotas</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0F1115">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Equipeças Rotas">
+<meta name="description" content="Gestão de oficinas e expedições — Equipeças">
+<link rel="manifest" href="data:application/manifest+json,{"name":"Equipe%C3%A7as%20Rotas","short_name":"Equipe%C3%A7as","start_url":".","display":"standalone","background_color":"%230F1115","theme_color":"%230F1115","lang":"pt-BR","icons":[{"src":"data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20192%20192%27%3E%3Crect%20width%3D%27192%27%20height%3D%27192%27%20rx%3D%2732%27%20fill%3D%27%233B82F6%27%2F%3E%3Ctext%20x%3D%2796%27%20y%3D%27120%27%20font-size%3D%2790%27%20text-anchor%3D%27middle%27%20fill%3D%27white%27%3E%F0%9F%9A%9A%3C%2Ftext%3E%3C%2Fsvg%3E","sizes":"192x192","type":"image/svg+xml"},{"src":"data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20512%20512%27%3E%3Crect%20width%3D%27512%27%20height%3D%27512%27%20rx%3D%2796%27%20fill%3D%27%233B82F6%27%2F%3E%3Ctext%20x%3D%27256%27%20y%3D%27320%27%20font-size%3D%27240%27%20text-anchor%3D%27middle%27%20fill%3D%27white%27%3E%F0%9F%9A%9A%3C%2Ftext%3E%3C%2Fsvg%3E","sizes":"512x512","type":"image/svg+xml"}]}">
+<style>
+:root{
+  --fundo:#0F1115;
+  --fundo-card:#171A21;
+  --fundo-card-hover:#1D212B;
+  --borda:#2A2F3A;
+  --primaria:#3B82F6;
+  --primaria-hover:#2563EB;
+  --sucesso:#22C55E;
+  --perigo:#EF4444;
+  --alerta:#F59E0B;
+  --texto:#E6E8EC;
+  --texto-sec:#9AA3AF;
+  --texto-desab:#5B6370;
+  --topbar-h:52px;
+  --bottombar-h:62px;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{height:100%;margin:0;}
+body{
+  background:#000;
+  color:var(--texto);
+  font-family:"Segoe UI",Inter,Arial,sans-serif;
+  font-size:15px;
+}
+button{font-family:inherit;cursor:pointer;}
+input,select,textarea{font-family:inherit;}
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-thumb{background:var(--borda);border-radius:4px;}
+
+#app{
+  max-width:480px; margin:0 auto; min-height:100vh;
+  background:var(--fundo); position:relative;
+  display:flex; flex-direction:column;
+  box-shadow:0 0 40px rgba(0,0,0,.6);
+}
+
+#topbar{
+  position:sticky; top:0; z-index:30; height:var(--topbar-h);
+  background:var(--fundo-card); border-bottom:1px solid var(--borda);
+  display:flex; align-items:center; padding:0 6px; gap:4px;
+}
+#btnVoltarTopo{
+  background:none; border:none; color:var(--texto); font-size:22px;
+  width:40px; height:40px; border-radius:20px; display:flex; align-items:center; justify-content:center;
+  visibility:hidden;
+}
+#btnVoltarTopo.mostrar{ visibility:visible; }
+#btnVoltarTopo:active{ background:var(--fundo-card-hover); }
+#tituloTopo{ font-size:16px; font-weight:600; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+#paginas{ flex:1; overflow:hidden; position:relative; }
+.pagina{
+  display:none; position:absolute; inset:0; overflow-y:auto;
+  padding:16px 16px calc(var(--bottombar-h) + 24px) 16px;
+}
+.pagina.ativa{ display:block; }
+
+#bottombar{
+  position:sticky; bottom:0; z-index:30; height:var(--bottombar-h);
+  background:var(--fundo-card); border-top:1px solid var(--borda);
+  display:flex;
+}
+#bottombar.oculta{ display:none; }
+.tab-btn{
+  flex:1; background:none; border:none; color:var(--texto-sec);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+  font-size:10.5px; padding:4px 0;
+}
+.tab-btn .ic{ font-size:19px; }
+.tab-btn.ativo{ color:var(--primaria); }
+
+h1.titulo-pagina{ font-size:21px; font-weight:700; margin:2px 0 4px 0; }
+.legenda{ font-size:12.5px; color:var(--texto-sec); line-height:1.4; }
+.subtitulo{ font-size:12px; font-weight:700; color:var(--texto-sec); letter-spacing:.4px;
+  text-transform:uppercase; margin:16px 0 6px 0;}
+
+.btn{ background:var(--fundo-card); color:var(--texto); border:1px solid var(--borda);
+  border-radius:8px; padding:11px 16px; font-size:14.5px; width:100%; }
+.btn:active{ background:var(--fundo-card-hover); }
+.btn:disabled{ color:var(--texto-desab); }
+.btn.primario{ background:var(--primaria); border:none; color:#fff; font-weight:600; }
+.btn.sucesso{ background:var(--sucesso); border:none; color:#06210F; font-weight:600; }
+.btn.perigo{ background:transparent; border:1px solid var(--perigo); color:var(--perigo); }
+.btn.pequeno{ width:auto; padding:8px 12px; font-size:13px; }
+.linha-btns{ display:flex; gap:8px; }
+.linha-btns .btn{ flex:1; }
+
+input[type=text], input[type=search], input[type=file]{
+  background:var(--fundo); border:1px solid var(--borda); border-radius:8px;
+  padding:11px 12px; color:var(--texto); width:100%; font-size:15px;
+}
+input:focus{ outline:none; border-color:var(--primaria); }
+label.rotulo{ display:block; margin:12px 0 5px 0; color:var(--texto-sec); font-size:12.5px;}
+select.sel{
+  background:var(--fundo); border:1px solid var(--borda); border-radius:8px;
+  padding:11px 12px; color:var(--texto); width:100%; font-size:15px;
+}
+
+.card{ background:var(--fundo-card); border:1px solid var(--borda); border-radius:12px;
+  padding:16px; margin-bottom:12px; }
+.card h3{ margin:0 0 4px 0; font-size:15px; }
+
+.grid-launcher{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px; }
+.card-launcher{
+  background:var(--fundo-card); border:1px solid var(--borda); border-radius:14px;
+  padding:18px 14px; text-align:left; display:flex; flex-direction:column; gap:8px;
+}
+.card-launcher:active{ background:var(--fundo-card-hover); }
+.card-launcher .ic{ font-size:26px; }
+.card-launcher .nome{ font-weight:700; font-size:14.5px; }
+.card-launcher .desc{ font-size:11.5px; color:var(--texto-sec); line-height:1.3; }
+
+.card-rota{
+  background:var(--fundo-card); border:1px solid var(--borda); border-radius:12px;
+  padding:14px 16px; margin-bottom:12px;
+}
+.card-rota h3{ margin:0 0 4px 0; font-size:16px; font-weight:700; }
+.card-rota .status{ font-weight:700; font-size:12.5px; margin-top:2px; }
+.card-rota .botoes{ display:flex; gap:8px; margin-top:12px; }
+.vazio{ text-align:center; color:var(--texto-sec); padding:50px 12px; white-space:pre-line; font-size:14px;}
+
+.lista-caixa{ background:var(--fundo-card); border:1px solid var(--borda); border-radius:10px; overflow:hidden; }
+.item-lista{ padding:12px; border-bottom:1px solid var(--borda); display:flex; align-items:center; gap:10px; }
+.item-lista:last-child{ border-bottom:none; }
+.item-lista:active{ background:var(--fundo-card-hover); }
+.item-lista .txt{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.item-lista input[type=checkbox]{ width:20px; height:20px; flex-shrink:0; }
+
+.card-oficina{
+  background:var(--fundo-card); border:1px solid var(--borda); border-radius:12px;
+  padding:14px 16px; margin-bottom:10px;
+}
+.card-oficina .cabecalho{ display:flex; align-items:flex-start; gap:10px; }
+.card-oficina .info{ flex:1; min-width:0; }
+.card-oficina .nome{ font-weight:700; font-size:15px; margin:0 0 2px 0; }
+.card-oficina .meta{ font-size:12.5px; color:var(--texto-sec); }
+.card-oficina .distancia{
+  flex-shrink:0; font-size:12px; font-weight:700; color:var(--primaria);
+  background:rgba(59,130,246,.12); padding:4px 8px; border-radius:6px;
+}
+.card-oficina .acoes{ display:flex; gap:8px; margin-top:12px; }
+.card-oficina .acoes .btn{ flex:1; }
+
+.chip-remover{
+  width:26px;height:26px;border-radius:13px;border:none; flex-shrink:0;
+  background:transparent;color:var(--texto-sec);font-weight:700;font-size:16px;line-height:1;
+}
+.chip-remover:active{ background:var(--perigo); color:#fff; }
+
+.badge{ display:inline-block; font-size:10.5px; padding:2px 6px; border-radius:5px; margin-left:4px; }
+.badge.foto{ background:#334155; color:#cbd5e1; }
+.badge.verificada{ background:#14532d; color:#86efac; }
+
+#tituloRotaEdit{
+  font-size:19px; font-weight:700; background:transparent; border:1px solid transparent;
+  border-radius:8px; padding:6px 8px; color:var(--texto); width:100%; margin-bottom:4px;
+}
+#tituloRotaEdit:focus{ border-color:var(--primaria); background:var(--fundo-card); outline:none;}
+
+.foto-preview{
+  width:88px;height:88px;border:1px solid var(--borda);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+  color:var(--texto-sec); font-size:11px; text-align:center; flex-shrink:0;
+}
+.foto-preview img{ width:100%; height:100%; object-fit:cover; }
+
+.toast{
+  position:fixed; left:50%; bottom:calc(var(--bottombar-h) + 14px); transform:translate(-50%,8px);
+  background:var(--fundo-card); border:1px solid var(--borda); border-left:4px solid var(--primaria);
+  padding:10px 16px; border-radius:10px; font-size:13.5px; max-width:90%;
+  box-shadow:0 6px 18px rgba(0,0,0,.5); z-index:200; opacity:0;
+  transition:.25s; pointer-events:none;
+}
+.toast.mostrar{ opacity:1; transform:translate(-50%,0); }
+.toast.erro{ border-left-color:var(--perigo); }
+.toast.sucesso{ border-left-color:var(--sucesso); }
+
+hr{ border:none; border-top:1px solid var(--borda); margin:16px 0; }
+
+.linha-form-dupla{ display:flex; gap:8px; }
+.linha-form-dupla > div{ flex:1; }
+.linha-form-dupla > div.estreita{ flex:0 0 68px; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div id="topbar">
+    <button id="btnVoltarTopo" onclick="voltar()">←</button>
+    <div id="tituloTopo">Equipeças Rotas</div>
+  </div>
+
+  <div id="paginas">
+
+    <!-- ===================== PÁGINA INICIAL ===================== -->
+    <div class="pagina" id="pagina-inicio">
+      <h1 class="titulo-pagina">🚚 Equipeças Rotas</h1>
+      <div class="legenda">Gestão de oficinas e expedições. Dados salvos automaticamente neste dispositivo.</div>
+      <div class="grid-launcher">
+        <button class="card-launcher" onclick="irPara('painel-rotas')">
+          <div class="ic">🧭</div>
+          <div class="nome">Painel de Rotas</div>
+          <div class="desc" id="resumoRotasLauncher">0 rotas abertas</div>
+        </button>
+        <button class="card-launcher" onclick="irPara('oficinas')">
+          <div class="ic">🏭</div>
+          <div class="nome">Oficinas</div>
+          <div class="desc" id="resumoOficinasLauncher">0 cadastradas</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- ===================== PAINEL DE ROTAS ===================== -->
+    <div class="pagina" id="pagina-painel-rotas">
+      <h1 class="titulo-pagina">Painel de Rotas</h1>
+      <div class="legenda" id="legendaLimite"></div>
+      <button class="btn primario" id="btnNovaRota" style="margin-top:14px;" onclick="criarRota()">+ Nova rota</button>
+      <div id="listaRotas" style="margin-top:16px;"></div>
+    </div>
+
+    <!-- ===================== DETALHE DA ROTA ===================== -->
+    <div class="pagina" id="pagina-rota-detalhe">
+      <input id="tituloRotaEdit" value="Rota" onchange="renomearRota(this.value)">
+      <button class="btn perigo pequeno" onclick="excluirRotaAtual()">🗑 Excluir rota</button>
+
+      <div class="subtitulo" id="labelSelecionadas">Oficinas selecionadas (0)</div>
+      <div class="lista-caixa" id="listaSelecionadas"></div>
+
+      <div class="subtitulo">Buscar / adicionar oficinas</div>
+      <input type="search" placeholder="Pesquisar por nome ou cidade..." id="buscaRota" oninput="renderListaTodasRota()">
+      <div class="lista-caixa" id="listaTodasRota" style="margin-top:10px; max-height:260px; overflow-y:auto;"></div>
+
+      <div class="subtitulo">Ponto de partida</div>
+      <select id="selOrigem" class="sel" onchange="aoMudarOrigem()">
+        <option value="sede">Sede Equipeças</option>
+        <option value="gps">Localização Atual (GPS)</option>
+        <option value="primeira">Primeira Oficina da Lista</option>
+      </select>
+      <div class="legenda" id="labelOrigemRota" style="margin-top:6px;"></div>
+
+      <label class="rotulo">Transporte</label>
+      <select id="selTransporte" class="sel">
+        <option value="driving">Carro</option>
+        <option value="walking">A pé</option>
+        <option value="bicycling">Bicicleta</option>
+      </select>
+
+      <label class="rotulo">Algoritmo</label>
+      <select id="selAlgoritmo" class="sel">
+        <option value="auto">Automático</option>
+        <option value="nn">Nearest Neighbor</option>
+        <option value="2opt">NN + 2-opt</option>
+      </select>
+
+      <button class="btn primario" style="margin-top:14px;" onclick="otimizarRotaAtual()">⚡ Otimizar rota</button>
+      <div class="legenda" id="statusOtimizacao" style="margin-top:8px;"></div>
+
+      <div class="subtitulo">Rota otimizada</div>
+      <div class="lista-caixa" id="listaResultado"></div>
+
+      <div class="linha-btns" style="margin-top:12px;">
+        <button class="btn sucesso" id="btnCopiarLink" disabled onclick="copiarLinkRota()">📋 Copiar link</button>
+        <button class="btn" id="btnAbrirMaps" disabled onclick="abrirMapsRota()">🌐 Abrir</button>
+      </div>
+      <button class="btn primario" id="btnWhatsApp" disabled style="margin-top:8px;" onclick="enviarWhatsApp()">💬 Enviar Rota via WhatsApp</button>
+    </div>
+
+    <!-- ===================== OFICINAS (lista centralizada) ===================== -->
+    <div class="pagina" id="pagina-oficinas">
+      <h1 class="titulo-pagina">Oficinas cadastradas</h1>
+      <div class="legenda" style="margin-bottom:8px;">Ordenadas por distância em relação à origem abaixo. Salvamento automático.</div>
+
+      <label class="rotulo">Origem para distância</label>
+      <select id="selOrigemLista" class="sel" onchange="aoMudarOrigemLista()">
+        <option value="sede">Sede Equipeças</option>
+        <option value="gps">Localização Atual (GPS)</option>
+      </select>
+      <div class="legenda" id="labelOrigemLista" style="margin-top:6px;"></div>
+
+      <input type="search" placeholder="Pesquisar por nome, cidade ou endereço..." id="buscaOficinas" oninput="renderListaOficinas(false)" style="margin-top:12px;">
+      <button class="btn primario" style="margin-top:10px;" onclick="novaOficinaForm()">+ Nova oficina</button>
+      <div id="listaOficinas" style="margin-top:12px;"></div>
+    </div>
+
+    <!-- ===================== EDIÇÃO DE OFICINA ===================== -->
+    <div class="pagina" id="pagina-editar-oficina">
+      <h1 class="titulo-pagina" id="tituloFormOficina">Nova oficina</h1>
+
+      <label class="rotulo">Nome *</label>
+      <input type="text" id="ofNome" placeholder="Nome da oficina">
+
+      <label class="rotulo">Endereço</label>
+      <input type="text" id="ofEndereco" placeholder="Rua, número">
+
+      <div class="linha-form-dupla">
+        <div>
+          <label class="rotulo">Cidade</label>
+          <input type="text" id="ofCidade">
+        </div>
+        <div class="estreita">
+          <label class="rotulo">UF</label>
+          <input type="text" id="ofEstado" maxlength="2">
+        </div>
+      </div>
+
+      <label class="rotulo">Telefone</label>
+      <input type="text" id="ofTelefone">
+
+      <label class="rotulo">Link do Google Maps</label>
+      <input type="text" id="ofMapsLink" placeholder="Colar link do Google Maps..." oninput="aoColarLinkOficina(this.value)">
+
+      <button class="btn sucesso" id="btnGpsOficina" style="margin-top:12px;" onclick="capturarLocalizacaoGPS()">📍 Usar minha localização atual (GPS)</button>
+      <div class="legenda" id="ofGpsStatus" style="margin-top:6px;"></div>
+
+      <label class="rotulo">ou buscar coordenadas por endereço (simulado)</label>
+      <input type="text" id="ofGeoBusca" placeholder="Ex.: Rua Exemplo, 123, Curitiba - PR">
+      <button class="btn pequeno" style="margin-top:8px;" onclick="buscarGeocodingOficina()">Buscar coordenadas</button>
+      <div class="legenda" id="ofCoordsLabel" style="margin-top:6px;">Sem coordenadas definidas</div>
+
+      <hr>
+
+      <label class="rotulo">Foto</label>
+      <div style="display:flex; gap:12px; align-items:center;">
+        <div class="foto-preview" id="ofFotoPreview">Nenhuma<br>foto</div>
+        <div style="display:flex; flex-direction:column; gap:8px; flex:1;">
+          <input type="file" id="ofFotoInput" accept="image/*" style="display:none" onchange="aoEscolherFotoOficina(event)">
+          <button class="btn pequeno" onclick="document.getElementById('ofFotoInput').click()">📷 Selecionar foto</button>
+          <button class="btn pequeno" id="btnVerFoto" onclick="verFotoOficina()" disabled>🔍 Ver foto</button>
+        </div>
+      </div>
+
+      <div style="margin-top:14px; font-size:14.5px;">
+        <label style="display:flex; align-items:center; gap:8px;">
+          <input type="checkbox" id="ofVerificada" style="width:18px;height:18px;"> Oficina verificada
+        </label>
+      </div>
+
+      <hr>
+      <div class="linha-btns">
+        <button class="btn primario" onclick="salvarOficina()">Salvar</button>
+        <button class="btn" onclick="voltar()">Cancelar</button>
+      </div>
+      <div class="legenda" id="ofFeedback" style="margin-top:10px;"></div>
+    </div>
+
+  </div>
+
+  <div id="bottombar">
+    <button class="tab-btn ativo" data-raiz="inicio" onclick="irPara('inicio')"><span class="ic">🏠</span>Início</button>
+    <button class="tab-btn" data-raiz="painel-rotas" onclick="irPara('painel-rotas')"><span class="ic">🧭</span>Rotas</button>
+    <button class="tab-btn" data-raiz="oficinas" onclick="irPara('oficinas')"><span class="ic">🏭</span>Oficinas</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================================
+   Equipeças Rotas — app web mobile-first, arquivo único
+   - Backup automático transparente via localStorage (sem tela de Backup)
+   - Lista de oficinas ordenada por distância (Haversine) sem interferir no foco
+   - Gestão centralizada: Nova / Editar / Excluir na lista
+   - GPS robusto, origem dinâmica, WhatsApp com Current+Location, PWA
+========================================================================= */
+
+const PAGINAS_RAIZ = ['inicio','painel-rotas','oficinas'];
+const TITULOS = {
+  'inicio':'Equipeças Rotas', 'painel-rotas':'Painel de Rotas',
+  'rota-detalhe':'Rota', 'oficinas':'Oficinas', 'editar-oficina':'Oficina',
+};
+
+const SEDE_EQUIPECAS = {
+  lat: -25.538823,
+  lon: -49.3014834,
+  label: 'Equipeças'
+};
+
+let pilha = ['inicio'];
+
+let proximoIdOficina = 1;
+let proximoIdRota = 1;
+let oficinas = [];
+let rotas = [];
+let rotaAtualId = null;
+let oficinaFormAtualId = null;
+let fotoFormPendente = null;
+
+let gpsOrigem = { lat: null, lon: null, label: '' };
+
+/* Cache da ordem por distância — só recalcula ao salvar ou mudar origem */
+let idsOrdenadosPorDistancia = [];
+
+const CHAVE_STORAGE = 'motorista_expedicao_dados_v1';
+
+/* ========== CONFIGURAÇÃO NUVEM (JSONBin.io) ==========
+   1. Crie conta em https://jsonbin.io
+   2. Crie um Bin vazio e copie o Bin ID
+   3. Em Account → API Keys, copie a Master Key
+   4. Cole abaixo (deixe as aspas):
+*/
+const NUVEM_API_KEY = "$2a$10$b.IMv/Sd6mbQDgSHn/LfZe95/I9LPmm6U91TqM6evdN0CKuDqaf76"; // Master Key JSONBin
+const NUVEM_BIN_ID  = "6a878607da38895dfefd4505"; // Bin ID JSONBin
+
+let timerBackupNuvem = null;
+
+function aplicarDados(dados){
+  if(!dados || typeof dados !== 'object') return false;
+  oficinas = Array.isArray(dados.oficinas) ? dados.oficinas : [];
+  rotas = Array.isArray(dados.rotas) ? dados.rotas : [];
+  const maiorIdOficina = oficinas.reduce((m,o)=>Math.max(m, o.id||0), 0);
+  const maiorIdRota = rotas.reduce((m,r)=>Math.max(m, r.id||0), 0);
+  proximoIdOficina = Number.isFinite(dados.proximoIdOficina) ? dados.proximoIdOficina : (maiorIdOficina+1);
+  proximoIdRota = Number.isFinite(dados.proximoIdRota) ? dados.proximoIdRota : (maiorIdRota+1);
+  return true;
+}
+
+/** Envia os dados para a nuvem em segundo plano (debounce 2s). */
+function backupAutomaticoNuvem(){
+  // Não tenta se ainda não configurou as chaves
+  if(!NUVEM_API_KEY || NUVEM_API_KEY === 'SUA_CHAVE_API_AQUI' ||
+     !NUVEM_BIN_ID  || NUVEM_BIN_ID  === 'SEU_BIN_ID_AQUI'){
+    return;
+  }
+  clearTimeout(timerBackupNuvem);
+  timerBackupNuvem = setTimeout(()=>{
+    const payload = {
+      proximoIdOficina,
+      proximoIdRota,
+      oficinas,
+      rotas,
+      salvo_em: new Date().toISOString()
+    };
+    fetch(`https://api.jsonbin.io/v3/b/${NUVEM_BIN_ID}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': NUVEM_API_KEY
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(res => {
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      return res.json();
+    })
+    .then(() => console.log('Backup automático em nuvem concluído!'))
+    .catch(err => console.error('Erro no backup em nuvem:', err));
+  }, 2000);
+}
+
+/** Salva no localStorage e dispara backup em nuvem. */
+function salvarEstado(){
+  try{
+    const payload = {
+      proximoIdOficina, proximoIdRota,
+      oficinas, rotas,
+      salvo_em: new Date().toISOString(),
+    };
+    localStorage.setItem(CHAVE_STORAGE, JSON.stringify(payload));
+    backupAutomaticoNuvem();
+  }catch(e){
+    console.error('Erro ao salvar dados localmente:', e);
+    mostrarToast('⚠ Não foi possível salvar os dados localmente.','erro');
+  }
+}
+
+function carregarEstado(){
+  try{
+    const bruto = localStorage.getItem(CHAVE_STORAGE);
+    if(!bruto) return false;
+    const dados = JSON.parse(bruto);
+    return aplicarDados(dados);
+  }catch(e){
+    console.error('Erro ao carregar dados do localStorage:', e);
+    return false;
+  }
+}
+
+/** Tenta restaurar da nuvem (usado na abertura do app). */
+function restaurarDaNuvem(){
+  if(!NUVEM_API_KEY || NUVEM_API_KEY === 'SUA_CHAVE_API_AQUI' ||
+     !NUVEM_BIN_ID  || NUVEM_BIN_ID  === 'SEU_BIN_ID_AQUI'){
+    return Promise.resolve(false);
+  }
+  return fetch(`https://api.jsonbin.io/v3/b/${NUVEM_BIN_ID}/latest`, {
+    method: 'GET',
+    headers: { 'X-Master-Key': NUVEM_API_KEY }
+  })
+  .then(res => {
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    return res.json();
+  })
+  .then(json => {
+    const dados = json && json.record ? json.record : json;
+    if(!dados || !Array.isArray(dados.oficinas)) return false;
+
+    // Usa nuvem se local estiver vazio OU se a nuvem for mais recente
+    let localTs = null;
+    try{
+      const bruto = localStorage.getItem(CHAVE_STORAGE);
+      if(bruto) localTs = JSON.parse(bruto).salvo_em || null;
+    }catch(_){}
+
+    const nuvemMaisRecente = !localTs || (dados.salvo_em && dados.salvo_em > localTs);
+    const localVazio = oficinas.length === 0;
+
+    if(localVazio || nuvemMaisRecente){
+      aplicarDados(dados);
+      // Grava local sem reenviar para a nuvem imediatamente
+      try{
+        localStorage.setItem(CHAVE_STORAGE, JSON.stringify({
+          proximoIdOficina, proximoIdRota, oficinas, rotas,
+          salvo_em: dados.salvo_em || new Date().toISOString()
+        }));
+      }catch(_){}
+      console.log('Dados restaurados da nuvem.');
+      return true;
+    }
+    return false;
+  })
+  .catch(err => {
+    console.warn('Não foi possível restaurar da nuvem:', err);
+    return false;
+  });
+}
+
+function semear(){
+  const exemplos = [
+    ['Oficina do Carlão','Rua das Palmeiras, 120','Curitiba','PR','(41) 99999-0001', -25.5162, -49.3124, true],
+    ['Auto Peças Silva','Av. Iguaçu, 800','Curitiba','PR','', -25.4772, -49.2931, false],
+    ['Mecânica São José','Rua XV de Novembro, 45','São José dos Pinhais','PR','(41) 98888-0002', -25.5305, -49.2064, true],
+    ['Borracharia Central','Rua Marechal Deodoro, 300','Curitiba','PR','', -25.4296, -49.2713, false],
+    ['Oficina Fazenda Rio Grande','Av. Presidente Vargas, 55','Fazenda Rio Grande','PR','(41) 97777-0003', -25.6614, -49.3072, true],
+    ['Retífica Rio Branco','Rua Rio Branco, 210','Curitiba','PR','', -25.4400, -49.2650, false],
+  ];
+  exemplos.forEach(([nome,endereco,cidade,estado,telefone,lat,lng,verificada])=>{
+    oficinas.push({id:proximoIdOficina++, nome, endereco, cidade, estado, telefone,
+      mapsLink:'', lat, lng, verificada, fotoDataUrl:null});
+  });
+}
+
+if(!carregarEstado()){
+  semear();
+  salvarEstado();
+}
+
+// Tenta sincronizar com a nuvem em segundo plano (não bloqueia a UI)
+restaurarDaNuvem().then(atualizou => {
+  if(atualizou){
+    recalcularOrdemPorDistancia();
+    if(typeof atualizarLauncher === 'function') atualizarLauncher();
+    const pg = document.querySelector('.pagina.ativa');
+    if(pg && pg.id === 'pagina-oficinas') renderListaOficinas(false);
+    if(pg && pg.id === 'pagina-painel-rotas') renderListaRotas();
+    if(pg && pg.id === 'pagina-inicio') atualizarLauncher();
+  }
+});
+
+function mostrarToast(msg, tipo=''){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast mostrar ' + tipo;
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>{ el.className='toast '+tipo; }, 3000);
+}
+
+function haversine(a,b){
+  const R=6371;
+  const toRad = d => d*Math.PI/180;
+  const dLat = toRad(b.lat-a.lat), dLng = toRad(b.lng-a.lng);
+  const s = Math.sin(dLat/2)**2 + Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*Math.sin(dLng/2)**2;
+  return R*2*Math.asin(Math.sqrt(Math.max(0,s)));
+}
+function distanciaTotal(pontos, ordem){
+  let d=0;
+  for(let i=0;i<ordem.length-1;i++) d += haversine(pontos[ordem[i]], pontos[ordem[i+1]]);
+  return d;
+}
+function nnDe(pontos, inicio){
+  const visitados = new Set([inicio]);
+  const ordem = [inicio];
+  while(ordem.length < pontos.length){
+    const ultimo = ordem[ordem.length-1];
+    let maisPerto=-1, menorDist=Infinity;
+    for(let i=0;i<pontos.length;i++){
+      if(!visitados.has(i)){
+        const d = haversine(pontos[ultimo], pontos[i]);
+        if(d<menorDist){ menorDist=d; maisPerto=i; }
+      }
+    }
+    visitados.add(maisPerto); ordem.push(maisPerto);
+  }
+  return ordem;
+}
+function nnMelhor(pontos){
+  let melhor=null, melhorD=Infinity;
+  for(let s=0;s<pontos.length;s++){
+    const ordem = nnDe(pontos,s);
+    const d = distanciaTotal(pontos,ordem);
+    if(d<melhorD){ melhorD=d; melhor=ordem; }
+  }
+  return melhor;
+}
+function twoOpt(pontos, ordemInicial){
+  let melhor = ordemInicial.slice();
+  let melhorou = true;
+  while(melhorou){
+    melhorou=false;
+    for(let i=0;i<melhor.length-1;i++){
+      for(let j=i+2;j<melhor.length;j++){
+        const novo = melhor.slice(0,i+1)
+          .concat(melhor.slice(i+1,j+1).reverse())
+          .concat(melhor.slice(j+1));
+        if(distanciaTotal(pontos,novo) < distanciaTotal(pontos,melhor)){
+          melhor=novo; melhorou=true;
+        }
+      }
+    }
+  }
+  return melhor;
+}
+function otimizar(pontos, algoritmo){
+  if(pontos.length<=1) return {ordem:pontos.map((_,i)=>i), nome:'Único destino'};
+  if(algoritmo==='nn') return {ordem:nnMelhor(pontos), nome:'Nearest Neighbor'};
+  const base = nnMelhor(pontos);
+  const otim = twoOpt(pontos, base);
+  return {ordem:otim, nome:'NN + 2-opt'};
+}
+function geocodeSimulado(texto){
+  let hash=0;
+  for(let i=0;i<texto.length;i++){ hash = (hash*31 + texto.charCodeAt(i)) % 100000; }
+  const lat = -25.40 - (hash % 400)/1000;
+  const lon = -49.20 - ((hash*7) % 400)/1000;
+  return {lat, lon};
+}
+function extrairCoordsTexto(texto){
+  if(!texto) return null;
+  let m = texto.match(/!3d(-?\d+\.\d+).*!4d(-?\d+\.\d+)/);
+  if(m) return {lat:parseFloat(m[1]), lng:parseFloat(m[2])};
+  m = texto.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if(m) return {lat:parseFloat(m[1]), lng:parseFloat(m[2])};
+  m = texto.match(/[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if(m) return {lat:parseFloat(m[1]), lng:parseFloat(m[2])};
+  return null;
+}
+
+function gerarLinkRota(pontosOrdenados, origem, transporte, modo){
+  const destino = pontosOrdenados[pontosOrdenados.length-1];
+  const intermediarios = pontosOrdenados.slice(0,-1);
+  let url = `https://www.google.com/maps/dir/?api=1&destination=${destino.lat},${destino.lng}&travelmode=${transporte}`;
+  if(modo === 'whatsapp'){
+    url += '&origin=Current+Location';
+  } else if(origem && origem.lat != null){
+    url += `&origin=${origem.lat},${origem.lon != null ? origem.lon : origem.lng}`;
+  }
+  if(intermediarios.length) url += `&waypoints=${intermediarios.map(p=>`${p.lat},${p.lng}`).join('|')}`;
+  return url;
+}
+
+function escapeHtml(s){
+  return (s==null?'':String(s)).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+function escapeAttr(s){ return escapeHtml(s).replace(/'/g, '&#39;'); }
+
+function isMobileDevice(){
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    || (navigator.maxTouchPoints > 0 && window.innerWidth < 768);
+}
+
+function isSecureContext(){
+  return window.isSecureContext === true
+    || location.protocol === 'https:'
+    || location.hostname === 'localhost'
+    || location.hostname === '127.0.0.1'
+    || location.hostname === '[::1]';
+}
+
+function resolverOrigemLista(){
+  const modo = document.getElementById('selOrigemLista')?.value || 'sede';
+  if(modo === 'gps' && gpsOrigem.lat != null){
+    return { lat: gpsOrigem.lat, lon: gpsOrigem.lon, label: 'GPS atual' };
+  }
+  return { lat: SEDE_EQUIPECAS.lat, lon: SEDE_EQUIPECAS.lon, label: SEDE_EQUIPECAS.label };
+}
+
+function recalcularOrdemPorDistancia(){
+  const origem = resolverOrigemLista();
+  const comCoords = oficinas.filter(o => o.lat != null && o.lng != null);
+  const semCoords = oficinas.filter(o => o.lat == null || o.lng == null);
+
+  comCoords.sort((a,b)=>{
+    const da = haversine({lat:origem.lat, lng:origem.lon}, {lat:a.lat, lng:a.lng});
+    const db = haversine({lat:origem.lat, lng:origem.lon}, {lat:b.lat, lng:b.lng});
+    return da - db;
+  });
+
+  idsOrdenadosPorDistancia = comCoords.map(o=>o.id).concat(semCoords.map(o=>o.id));
+}
+
+function distanciaOficina(of){
+  if(of.lat == null || of.lng == null) return null;
+  const origem = resolverOrigemLista();
+  return haversine({lat:origem.lat, lng:origem.lon}, {lat:of.lat, lng:of.lng});
+}
+
+function mostrarPagina(nome){
+  document.querySelectorAll('.pagina').forEach(p=>p.classList.remove('ativa'));
+  document.getElementById('pagina-'+nome).classList.add('ativa');
+  document.getElementById('tituloTopo').textContent = TITULOS[nome] || 'Equipeças Rotas';
+
+  const raiz = PAGINAS_RAIZ.includes(nome);
+  document.getElementById('btnVoltarTopo').classList.toggle('mostrar', !raiz);
+  document.getElementById('bottombar').classList.toggle('oculta', !raiz);
+  document.querySelectorAll('.tab-btn').forEach(b=>{
+    b.classList.toggle('ativo', raiz && b.dataset.raiz===nome);
+  });
+  const pg = document.getElementById('pagina-'+nome);
+  if(pg) pg.scrollTop = 0;
+
+  if(nome==='inicio') atualizarLauncher();
+  if(nome==='painel-rotas') renderListaRotas();
+  if(nome==='oficinas'){
+    atualizarLabelOrigemLista();
+    if(idsOrdenadosPorDistancia.length === 0) recalcularOrdemPorDistancia();
+    renderListaOficinas(false);
+  }
+}
+
+function irPara(nome){
+  pilha = [nome];
+  mostrarPagina(nome);
+}
+
+function abrirSubpagina(nome){
+  pilha.push(nome);
+  mostrarPagina(nome);
+}
+
+function voltar(){
+  if(pilha.length>1){
+    pilha.pop();
+    mostrarPagina(pilha[pilha.length-1]);
+  } else {
+    irPara('inicio');
+  }
+}
+
+function atualizarLauncher(){
+  document.getElementById('resumoRotasLauncher').textContent =
+    `${rotas.length} rota${rotas.length!==1?'s':''} aberta${rotas.length!==1?'s':''}`;
+  document.getElementById('resumoOficinasLauncher').textContent =
+    `${oficinas.length} cadastrada${oficinas.length!==1?'s':''}`;
+}
+
+const MAX_ROTAS = 10;
+
+function statusRota(rota){
+  const n = rota.oficinaIds.length;
+  if(n===0) return 'Vazia';
+  if(rota.otimizada) return 'Otimizada';
+  if(n>=2) return 'Pronta para otimização';
+  return 'Parcial';
+}
+function corStatus(status){
+  return {Vazia:'var(--texto-desab)', Parcial:'var(--alerta)',
+    'Pronta para otimização':'var(--primaria)', Otimizada:'var(--sucesso)'}[status] || 'var(--texto-sec)';
+}
+
+function renderListaRotas(){
+  document.getElementById('legendaLimite').textContent =
+    `${rotas.length} de ${MAX_ROTAS} rotas simultâneas em uso`;
+  document.getElementById('btnNovaRota').disabled = rotas.length >= MAX_ROTAS;
+
+  const box = document.getElementById('listaRotas');
+  box.innerHTML='';
+  if(rotas.length===0){
+    box.innerHTML = `<div class="vazio">Nenhuma rota aberta ainda.\nToque em "+ Nova rota" para começar uma expedição.</div>`;
+    return;
+  }
+  rotas.forEach(rota=>{
+    const n = rota.oficinaIds.length;
+    const cidades = rota.oficinaIds.map(id=> (oficinas.find(o=>o.id===id)||{}).cidade).filter(Boolean);
+    let cidadePred = '';
+    if(cidades.length){
+      const contagem = {};
+      cidades.forEach(c=>contagem[c]=(contagem[c]||0)+1);
+      cidadePred = Object.entries(contagem).sort((a,b)=>b[1]-a[1])[0][0];
+    }
+    const status = statusRota(rota);
+    const card = document.createElement('div');
+    card.className='card-rota';
+    card.innerHTML = `
+      <h3>${escapeHtml(rota.nome)}</h3>
+      <div class="legenda">${n} oficina${n!==1?'s':''}${cidadePred? ' • '+escapeHtml(cidadePred):''}</div>
+      <div class="status" style="color:${corStatus(status)}">${status}</div>
+      ${rota.distancia? `<div class="legenda">${rota.distancia.toFixed(1)} km otimizados</div>`:''}
+      <div class="botoes">
+        <button class="btn primario pequeno" style="flex:1;" onclick="abrirRota(${rota.id})">Abrir</button>
+        <button class="btn perigo pequeno" style="flex:1;" onclick="excluirRota(${rota.id})">Excluir</button>
+      </div>`;
+    box.appendChild(card);
+  });
+}
+
+function criarRota(){
+  if(rotas.length>=MAX_ROTAS){ mostrarToast('Limite de 10 rotas simultâneas atingido.','erro'); return; }
+  let i=1;
+  const nomesExistentes = new Set(rotas.map(r=>r.nome));
+  while(nomesExistentes.has(`Rota ${i}`)) i++;
+  const rota = {id:proximoIdRota++, nome:`Rota ${i}`, oficinaIds:[], otimizada:false, distancia:null, mapsUrl:null, algoritmo:null};
+  rotas.push(rota);
+  salvarEstado();
+  renderListaRotas();
+  abrirRota(rota.id);
+}
+
+function excluirRota(id){
+  const rota = rotas.find(r=>r.id===id);
+  if(!rota) return;
+  if(!confirm(`Excluir "${rota.nome}"?\n\nAs oficinas selecionadas continuam normalmente no cadastro.`)) return;
+  rotas = rotas.filter(r=>r.id!==id);
+  salvarEstado();
+  renderListaRotas();
+}
+
+function excluirRotaAtual(){
+  if(rotaAtualId==null) return;
+  const rota = rotas.find(r=>r.id===rotaAtualId);
+  if(!confirm(`Excluir "${rota.nome}"? As oficinas continuam no cadastro normalmente.`)) return;
+  rotas = rotas.filter(r=>r.id!==rotaAtualId);
+  salvarEstado();
+  irPara('painel-rotas');
+}
+
+function abrirRota(id){
+  rotaAtualId = id;
+  const rota = rotas.find(r=>r.id===id);
+  document.getElementById('tituloRotaEdit').value = rota.nome;
+  document.getElementById('buscaRota').value='';
+  document.getElementById('listaResultado').innerHTML='';
+  document.getElementById('statusOtimizacao').textContent='';
+  document.getElementById('btnCopiarLink').disabled = true;
+  document.getElementById('btnAbrirMaps').disabled = true;
+  document.getElementById('btnWhatsApp').disabled = true;
+  rota._mapsUrlAtual = rota.mapsUrl || null;
+  rota._mapsUrlWhatsApp = null;
+
+  const sel = document.getElementById('selOrigem');
+  sel.value = isMobileDevice() ? 'gps' : 'sede';
+
+  atualizarLabelOrigem();
+  renderListaSelecionadas();
+  renderListaTodasRota();
+
+  pilha = ['painel-rotas','rota-detalhe'];
+  mostrarPagina('rota-detalhe');
+  document.getElementById('tituloTopo').textContent = rota.nome;
+}
+
+function renomearRota(novoNomeBruto){
+  const rota = rotas.find(r=>r.id===rotaAtualId);
+  if(!rota) return;
+  const novoNome = novoNomeBruto.trim();
+  if(!novoNome){ document.getElementById('tituloRotaEdit').value = rota.nome; return; }
+  rota.nome = novoNome;
+  document.getElementById('tituloTopo').textContent = novoNome;
+  salvarEstado();
+  mostrarToast('Nome da rota atualizado.','sucesso');
+}
+
+function aoMudarOrigem(){
+  atualizarLabelOrigem();
+  const modo = document.getElementById('selOrigem').value;
+  if(modo === 'gps' && gpsOrigem.lat == null){
+    capturarGPSParaOrigem();
+  }
+}
+
+function atualizarLabelOrigem(){
+  const el = document.getElementById('labelOrigemRota');
+  const modo = document.getElementById('selOrigem').value;
+  if(modo === 'sede'){
+    el.textContent = `📍 Sede Equipeças (${SEDE_EQUIPECAS.lat.toFixed(5)}, ${SEDE_EQUIPECAS.lon.toFixed(5)})`;
+  } else if(modo === 'gps'){
+    if(gpsOrigem.lat != null){
+      el.textContent = `📍 GPS atual: ${gpsOrigem.lat.toFixed(5)}, ${gpsOrigem.lon.toFixed(5)}`;
+    } else {
+      el.textContent = '📍 Localização atual (GPS) — será solicitada ao otimizar.';
+    }
+  } else {
+    el.textContent = '📍 A rota partirá da primeira oficina da lista otimizada.';
+  }
+}
+
+function resolverOrigemCalculo(){
+  const modo = document.getElementById('selOrigem').value;
+  if(modo === 'sede'){
+    return { lat: SEDE_EQUIPECAS.lat, lon: SEDE_EQUIPECAS.lon, label: SEDE_EQUIPECAS.label };
+  }
+  if(modo === 'gps'){
+    if(gpsOrigem.lat != null){
+      return { lat: gpsOrigem.lat, lon: gpsOrigem.lon, label: gpsOrigem.label || 'Localização atual' };
+    }
+    return null;
+  }
+  return null;
+}
+
+function renderListaSelecionadas(){
+  const rota = rotas.find(r=>r.id===rotaAtualId);
+  const box = document.getElementById('listaSelecionadas');
+  box.innerHTML='';
+  document.getElementById('labelSelecionadas').textContent = `Oficinas selecionadas (${rota.oficinaIds.length})`;
+  if(rota.oficinaIds.length===0){
+    box.innerHTML = '<div class="item-lista" style="color:var(--texto-sec);">Nenhuma oficina selecionada ainda.</div>';
+    return;
+  }
+  rota.oficinaIds.forEach(id=>{
+    const of = oficinas.find(o=>o.id===id);
+    if(!of) return;
+    const linha = document.createElement('div');
+    linha.className='item-lista';
+    linha.innerHTML = `<span class="txt">${escapeHtml(of.nome)}${of.cidade? ' — '+escapeHtml(of.cidade):''}</span>
+      <button class="chip-remover" title="Remover desta rota" onclick="removerDaRota(${of.id}, '${escapeAttr(of.nome)}')">×</button>`;
+    box.appendChild(linha);
+  });
+}
+
+function removerDaRota(oficinaId, nomeOficina){
+  if(!confirm(`Remover "${nomeOficina}" desta rota?\n\nA oficina continua no cadastro geral.`)) return;
+  const rota = rotas.find(r=>r.id===rotaAtualId);
+  rota.oficinaIds = rota.oficinaIds.filter(id=>id!==oficinaId);
+  rota.otimizada=false; rota.distancia=null; rota.mapsUrl=null;
+  salvarEstado();
+  renderListaSelecionadas();
+  renderListaTodasRota();
+}
+
+function renderListaTodasRota(){
+  const rota = rotas.find(r=>r.id===rotaAtualId);
+  const busca = document.getElementById('buscaRota').value.trim().toLowerCase();
+  const box = document.getElementById('listaTodasRota');
+  box.innerHTML='';
+  const filtradas = oficinas.filter(o=>{
+    if(!busca) return true;
+    return (o.nome||'').toLowerCase().includes(busca) ||
+           (o.cidade||'').toLowerCase().includes(busca) ||
+           (o.endereco||'').toLowerCase().includes(busca);
+  });
+  if(filtradas.length===0){
+    box.innerHTML = '<div class="item-lista" style="color:var(--texto-sec);">Nenhuma oficina encontrada.</div>';
+    return;
+  }
+  filtradas.forEach(of=>{
+    const marcado = rota.oficinaIds.includes(of.id);
+    const linha = document.createElement('div');
+    linha.className='item-lista';
+    linha.innerHTML = `<input type="checkbox" ${marcado?'checked':''} onclick="event.stopPropagation(); alternarSelecao(${of.id})">
+      <span class="txt">${escapeHtml(of.nome)}${of.cidade? '  ·  '+escapeHtml(of.cidade):''}</span>
+      ${of.fotoDataUrl? '<span class="badge foto">📷</span>':''}
+      ${of.verificada? '<span class="badge verificada">✓</span>':''}`;
+    linha.onclick = ()=>alternarSelecao(of.id);
+    box.appendChild(linha);
+  });
+}
+
+function alternarSelecao(oficinaId){
+  const rota = rotas.find(r=>r.id===rotaAtualId);
+  if(rota.oficinaIds.includes(oficinaId)){
+    rota.oficinaIds = rota.oficinaIds.filter(id=>id!==oficinaId);
+  } else {
+    rota.oficinaIds.push(oficinaId);
+  }
+  rota.otimizada=false; rota.distancia=null; rota.mapsUrl=null;
+  salvarEstado();
+  renderListaSelecionadas();
+  renderListaTodasRota();
+}
+
+function capturarGPSParaOrigem(){
+  return new Promise((resolve)=>{
+    if(!('geolocation' in navigator)){
+      mostrarToast('Este dispositivo/navegador não suporta geolocalização.','erro');
+      resolve(false);
+      return;
+    }
+    if(!isSecureContext()){
+      mostrarToast('GPS bloqueado: abra o app em HTTPS ou localhost.','erro');
+      resolve(false);
+      return;
+    }
+    document.getElementById('labelOrigemRota').textContent = '⏳ Obtendo localização GPS...';
+    navigator.geolocation.getCurrentPosition(
+      (pos)=>{
+        gpsOrigem = {
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude,
+          label: 'Localização atual (GPS)'
+        };
+        atualizarLabelOrigem();
+        resolve(true);
+      },
+      (erro)=>{
+        let msg = 'Não foi possível obter a localização via GPS.';
+        if(erro.code === erro.PERMISSION_DENIED)
+          msg = 'Permissão de localização negada. Libere o acesso nas configurações do navegador.';
+        else if(erro.code === erro.POSITION_UNAVAILABLE)
+          msg = 'Localização indisponível. Ative o GPS e tente em local aberto.';
+        else if(erro.code === erro.TIMEOUT)
+          msg = 'Tempo esgotado ao obter localização. Tente novamente.';
+        mostrarToast(msg,'erro');
+        atualizarLabelOrigem();
+        resolve(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  });
+}
+
+async function otimizarRotaAtual(){
+  const rota = rotas.find(r=>r.id===rotaAtualId);
+  const selecionadas = rota.oficinaIds.map(id=>oficinas.find(o=>o.id===id)).filter(o=>o && o.lat!=null && o.lng!=null);
+  if(selecionadas.length<2){
+    mostrarToast('Selecione ao menos 2 oficinas com coordenadas para otimizar.','erro');
+    return;
+  }
+
+  const modoOrigem = document.getElementById('selOrigem').value;
+  if(modoOrigem === 'gps' && gpsOrigem.lat == null){
+    const ok = await capturarGPSParaOrigem();
+    if(!ok){
+      document.getElementById('statusOtimizacao').textContent = '⚠ Não foi possível obter GPS. Escolha outra origem ou tente novamente.';
+      return;
+    }
+  }
+
+  document.getElementById('statusOtimizacao').textContent='⏳ Calculando rota otimizada...';
+
+  setTimeout(()=>{
+    const pontos = selecionadas.map(o=>({lat:o.lat, lng:o.lng, id:o.id, label:o.nome}));
+    const algoritmo = document.getElementById('selAlgoritmo').value;
+    const transporte = document.getElementById('selTransporte').value;
+    const {ordem, nome} = otimizar(pontos, algoritmo==='auto' ? '2opt' : algoritmo);
+
+    const origemCalc = resolverOrigemCalculo();
+    let dist = distanciaTotal(pontos, ordem);
+    if(origemCalc && origemCalc.lat != null){
+      dist += haversine({lat:origemCalc.lat, lng:origemCalc.lon}, pontos[ordem[0]]);
+    }
+
+    const pontosOrdenados = ordem.map(i=>pontos[i]);
+    const urlPreview = gerarLinkRota(pontosOrdenados, origemCalc, transporte, 'preview');
+    const urlWhatsApp = gerarLinkRota(pontosOrdenados, null, transporte, 'whatsapp');
+
+    document.getElementById('statusOtimizacao').textContent = `✓ ${nome} — ${dist.toFixed(1)} km total`;
+    const lista = document.getElementById('listaResultado');
+    lista.innerHTML='';
+    if(origemCalc && origemCalc.lat != null){
+      const l = document.createElement('div');
+      l.className='item-lista';
+      l.innerHTML = `<span class="txt">🟢 Origem: ${escapeHtml(origemCalc.label || origemCalc.lat.toFixed(5)+', '+origemCalc.lon.toFixed(5))}</span>`;
+      lista.appendChild(l);
+    }
+    ordem.forEach((idx,passo)=>{
+      const l = document.createElement('div');
+      l.className='item-lista';
+      l.innerHTML = `<span class="txt">${passo+1}. ${escapeHtml(pontos[idx].label)}</span>`;
+      lista.appendChild(l);
+    });
+
+    rota.otimizada=true; rota.distancia=dist; rota.mapsUrl=urlPreview; rota.algoritmo=nome;
+    rota._mapsUrlAtual = urlPreview;
+    rota._mapsUrlWhatsApp = urlWhatsApp;
+    document.getElementById('btnCopiarLink').disabled=false;
+    document.getElementById('btnAbrirMaps').disabled=false;
+    document.getElementById('btnWhatsApp').disabled=false;
+    salvarEstado();
+  }, 300);
+}
+
+function copiarLinkRota(){
+  const rota = rotas.find(r=>r.id===rotaAtualId);
+  const url = (rota && (rota._mapsUrlWhatsApp || rota._mapsUrlAtual));
+  if(!url) return;
+  navigator.clipboard?.writeText(url).then(()=>{
+    document.getElementById('statusOtimizacao').textContent = '✓ Link copiado! Cole no WhatsApp do motorista.';
+    mostrarToast('Link copiado.','sucesso');
+  }).catch(()=>{
+    prompt('Copie o link manualmente:', url);
+  });
+}
+function abrirMapsRota(){
+  const rota = rotas.find(r=>r.id===rotaAtualId);
+  if(rota && rota._mapsUrlAtual) window.open(rota._mapsUrlAtual, '_blank');
+}
+function enviarWhatsApp(){
+  const rota = rotas.find(r=>r.id===rotaAtualId);
+  if(!rota || !rota._mapsUrlWhatsApp) return;
+  const texto = encodeURIComponent(
+    `*Rota: ${rota.nome}*\n\n` +
+    `Abra no Google Maps (parte da sua localização atual):\n${rota._mapsUrlWhatsApp}`
+  );
+  window.open(`https://wa.me/?text=${texto}`, '_blank');
+}
+
+function atualizarLabelOrigemLista(){
+  const el = document.getElementById('labelOrigemLista');
+  if(!el) return;
+  const modo = document.getElementById('selOrigemLista').value;
+  if(modo === 'gps'){
+    if(gpsOrigem.lat != null){
+      el.textContent = `📍 GPS: ${gpsOrigem.lat.toFixed(5)}, ${gpsOrigem.lon.toFixed(5)}`;
+    } else {
+      el.textContent = '📍 GPS ainda não capturado — toque para solicitar.';
+    }
+  } else {
+    el.textContent = `📍 Sede Equipeças (${SEDE_EQUIPECAS.lat.toFixed(5)}, ${SEDE_EQUIPECAS.lon.toFixed(5)})`;
+  }
+}
+
+async function aoMudarOrigemLista(){
+  const modo = document.getElementById('selOrigemLista').value;
+  if(modo === 'gps' && gpsOrigem.lat == null){
+    await capturarGPSParaOrigemLista();
+  }
+  atualizarLabelOrigemLista();
+  recalcularOrdemPorDistancia();
+  renderListaOficinas(false);
+}
+
+function capturarGPSParaOrigemLista(){
+  return new Promise((resolve)=>{
+    if(!('geolocation' in navigator)){
+      mostrarToast('GPS não disponível neste dispositivo.','erro');
+      resolve(false);
+      return;
+    }
+    if(!isSecureContext()){
+      mostrarToast('GPS bloqueado: abra o app em HTTPS ou localhost.','erro');
+      resolve(false);
+      return;
+    }
+    document.getElementById('labelOrigemLista').textContent = '⏳ Obtendo GPS...';
+    navigator.geolocation.getCurrentPosition(
+      (pos)=>{
+        gpsOrigem = {
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude,
+          label: 'Localização atual (GPS)'
+        };
+        resolve(true);
+      },
+      (erro)=>{
+        let msg = 'Não foi possível obter a localização.';
+        if(erro.code === erro.PERMISSION_DENIED)
+          msg = 'Permissão de localização negada. Libere nas configurações do navegador.';
+        else if(erro.code === erro.POSITION_UNAVAILABLE)
+          msg = 'Localização indisponível. Ative o GPS.';
+        else if(erro.code === erro.TIMEOUT)
+          msg = 'Tempo esgotado. Tente novamente.';
+        mostrarToast(msg,'erro');
+        resolve(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  });
+}
+
+function renderListaOficinas(reordenar){
+  if(reordenar) recalcularOrdemPorDistancia();
+
+  const busca = (document.getElementById('buscaOficinas').value||'').trim().toLowerCase();
+  const box = document.getElementById('listaOficinas');
+  box.innerHTML='';
+
+  let ordenadas = idsOrdenadosPorDistancia
+    .map(id => oficinas.find(o => o.id === id))
+    .filter(Boolean);
+
+  const idsNoCache = new Set(idsOrdenadosPorDistancia);
+  oficinas.forEach(o=>{
+    if(!idsNoCache.has(o.id)) ordenadas.push(o);
+  });
+
+  if(busca){
+    ordenadas = ordenadas.filter(o=>{
+      return (o.nome||'').toLowerCase().includes(busca) ||
+             (o.cidade||'').toLowerCase().includes(busca) ||
+             (o.endereco||'').toLowerCase().includes(busca);
+    });
+  }
+
+  if(ordenadas.length===0){
+    box.innerHTML='<div class="vazio">Nenhuma oficina encontrada.\nToque em "+ Nova oficina" para cadastrar.</div>';
+    return;
+  }
+
+  ordenadas.forEach(of=>{
+    const dist = distanciaOficina(of);
+    const distTxt = dist != null ? (dist < 10 ? dist.toFixed(1) : Math.round(dist)) + ' km' : '—';
+    const card = document.createElement('div');
+    card.className = 'card-oficina';
+    card.innerHTML = `
+      <div class="cabecalho">
+        <div class="info">
+          <div class="nome">${escapeHtml(of.nome)}
+            ${of.verificada? '<span class="badge verificada">✓</span>':''}
+            ${of.fotoDataUrl? '<span class="badge foto">📷</span>':''}
+          </div>
+          <div class="meta">${of.cidade? escapeHtml(of.cidade)+(of.estado? ' — '+escapeHtml(of.estado):'') : (of.endereco? escapeHtml(of.endereco):'Sem cidade')}</div>
+        </div>
+        <div class="distancia">${distTxt}</div>
+      </div>
+      <div class="acoes">
+        <button class="btn pequeno" onclick="editarOficina(${of.id})">✏️ Editar</button>
+        <button class="btn perigo pequeno" onclick="excluirOficinaDireto(${of.id}, '${escapeAttr(of.nome)}')">🗑️ Excluir</button>
+      </div>`;
+    box.appendChild(card);
+  });
+}
+
+function editarOficina(id){
+  preencherFormOficina(id);
+  abrirSubpagina('editar-oficina');
+}
+
+function excluirOficinaDireto(id, nome){
+  if(!confirm(`Excluir "${nome}" do cadastro?\n\nEsta ação não pode ser desfeita.`)) return;
+  oficinas = oficinas.filter(o=>o.id!==id);
+  rotas.forEach(r=> r.oficinaIds = r.oficinaIds.filter(oid=>oid!==id));
+  salvarEstado();
+  recalcularOrdemPorDistancia();
+  renderListaOficinas(false);
+  mostrarToast('Oficina excluída.','sucesso');
+}
+
+function novaOficinaForm(){
+  oficinaFormAtualId = null;
+  fotoFormPendente = null;
+  document.getElementById('tituloFormOficina').textContent='Nova oficina';
+  ['ofNome','ofEndereco','ofCidade','ofEstado','ofTelefone','ofMapsLink','ofGeoBusca'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('ofCoordsLabel').textContent='Sem coordenadas definidas';
+  document.getElementById('ofFotoPreview').innerHTML='Nenhuma<br>foto';
+  document.getElementById('btnVerFoto').disabled=true;
+  document.getElementById('ofVerificada').checked=false;
+  document.getElementById('ofFeedback').textContent='';
+  document.getElementById('ofGpsStatus').textContent='';
+  window._ofLat=null; window._ofLon=null;
+  abrirSubpagina('editar-oficina');
+  document.getElementById('tituloTopo').textContent = 'Nova oficina';
+}
+
+function preencherFormOficina(id){
+  const of = oficinas.find(o=>o.id===id);
+  if(!of) return;
+  oficinaFormAtualId = id;
+  fotoFormPendente = null;
+  document.getElementById('tituloFormOficina').textContent='Editar oficina';
+  document.getElementById('ofNome').value = of.nome||'';
+  document.getElementById('ofEndereco').value = of.endereco||'';
+  document.getElementById('ofCidade').value = of.cidade||'';
+  document.getElementById('ofEstado').value = of.estado||'';
+  document.getElementById('ofTelefone').value = of.telefone||'';
+  document.getElementById('ofMapsLink').value = of.mapsLink||'';
+  document.getElementById('ofGeoBusca').value='';
+  window._ofLat = of.lat; window._ofLon = of.lng;
+  atualizarLabelCoordsOficina();
+
+  const preview = document.getElementById('ofFotoPreview');
+  if(of.fotoDataUrl){
+    preview.innerHTML = `<img src="${of.fotoDataUrl}">`;
+    document.getElementById('btnVerFoto').disabled=false;
+  } else {
+    preview.innerHTML='Nenhuma<br>foto';
+    document.getElementById('btnVerFoto').disabled=true;
+  }
+  document.getElementById('ofVerificada').checked = !!of.verificada;
+  document.getElementById('ofFeedback').textContent='';
+  document.getElementById('ofGpsStatus').textContent='';
+  document.getElementById('tituloTopo').textContent = of.nome;
+}
+
+function atualizarLabelCoordsOficina(){
+  const el = document.getElementById('ofCoordsLabel');
+  if(window._ofLat!=null && window._ofLon!=null){
+    el.textContent = `📍 ${(+window._ofLat).toFixed(6)}, ${(+window._ofLon).toFixed(6)}`;
+  } else {
+    el.textContent = 'Sem coordenadas definidas';
+  }
+}
+function aoColarLinkOficina(texto){
+  const c = extrairCoordsTexto(texto);
+  if(c){ window._ofLat=c.lat; window._ofLon=c.lng; atualizarLabelCoordsOficina(); }
+}
+function buscarGeocodingOficina(){
+  const endereco = document.getElementById('ofGeoBusca').value.trim();
+  if(!endereco) return;
+  document.getElementById('ofFeedback').textContent='Buscando endereço... (simulado)';
+  setTimeout(()=>{
+    const {lat,lon} = geocodeSimulado(endereco);
+    window._ofLat=lat; window._ofLon=lon;
+    atualizarLabelCoordsOficina();
+    document.getElementById('ofFeedback').textContent = `✓ Localização simulada para "${endereco}"`;
+  }, 250);
+}
+
+function capturarLocalizacaoGPS(){
+  const statusEl = document.getElementById('ofGpsStatus');
+
+  if(!('geolocation' in navigator)){
+    statusEl.textContent = '⚠ Este dispositivo/navegador não suporta captura de GPS.';
+    mostrarToast('GPS não disponível neste dispositivo.','erro');
+    return;
+  }
+
+  if(!isSecureContext()){
+    statusEl.textContent = '⚠ Geolocalização bloqueada: a página precisa ser servida em HTTPS (ou localhost).';
+    mostrarToast('Abra o app em HTTPS ou localhost para usar o GPS.','erro');
+    return;
+  }
+
+  statusEl.textContent = '⏳ Obtendo localização atual via GPS...';
+  navigator.geolocation.getCurrentPosition(
+    (pos)=>{
+      window._ofLat = pos.coords.latitude;
+      window._ofLon = pos.coords.longitude;
+      atualizarLabelCoordsOficina();
+      const precisao = pos.coords.accuracy!=null ? ` (precisão de ${Math.round(pos.coords.accuracy)} m)` : '';
+      statusEl.textContent = `✓ Localização GPS capturada com sucesso${precisao}.`;
+      mostrarToast('Posição via GPS capturada.','sucesso');
+    },
+    (erro)=>{
+      let msg = 'Não foi possível obter a localização via GPS.';
+      if(erro.code === erro.PERMISSION_DENIED){
+        msg = 'Permissão de localização negada. Habilite o acesso à localização nas configurações do navegador.';
+      } else if(erro.code === erro.POSITION_UNAVAILABLE){
+        msg = 'Localização indisponível. Verifique se o GPS está ativado.';
+      } else if(erro.code === erro.TIMEOUT){
+        msg = 'Tempo esgotado ao obter a localização. Tente novamente.';
+      }
+      statusEl.textContent = '⚠ ' + msg;
+      mostrarToast(msg,'erro');
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+  );
+}
+
+function aoEscolherFotoOficina(ev){
+  const arquivo = ev.target.files[0];
+  if(!arquivo) return;
+  const leitor = new FileReader();
+  leitor.onload = ()=>{
+    fotoFormPendente = leitor.result;
+    document.getElementById('ofFotoPreview').innerHTML = `<img src="${fotoFormPendente}">`;
+    document.getElementById('btnVerFoto').disabled=false;
+    document.getElementById('ofFeedback').textContent='✓ Foto pronta — toque em Salvar para confirmar.';
+  };
+  leitor.readAsDataURL(arquivo);
+}
+function verFotoOficina(){
+  const url = fotoFormPendente || (oficinaFormAtualId && (oficinas.find(o=>o.id===oficinaFormAtualId)||{}).fotoDataUrl);
+  if(!url) return;
+  const w = window.open('', '_blank');
+  w.document.write(`<title>Foto</title><body style="margin:0;background:#111;display:flex;align-items:center;justify-content:center;min-height:100vh;"><img src="${url}" style="max-width:100%;max-height:100vh;"></body>`);
+}
+
+function salvarOficina(){
+  const nome = document.getElementById('ofNome').value.trim();
+  if(!nome){ document.getElementById('ofFeedback').textContent='⚠ O nome da oficina é obrigatório.'; return; }
+  const dados = {
+    nome,
+    endereco: document.getElementById('ofEndereco').value.trim() || null,
+    cidade: document.getElementById('ofCidade').value.trim() || null,
+    estado: document.getElementById('ofEstado').value.trim() || null,
+    telefone: document.getElementById('ofTelefone').value.trim() || null,
+    mapsLink: document.getElementById('ofMapsLink').value.trim(),
+    lat: window._ofLat!=null? +window._ofLat : null,
+    lng: window._ofLon!=null? +window._ofLon : null,
+    verificada: document.getElementById('ofVerificada').checked,
+  };
+  if(fotoFormPendente) dados.fotoDataUrl = fotoFormPendente;
+
+  if(oficinaFormAtualId){
+    const of = oficinas.find(o=>o.id===oficinaFormAtualId);
+    Object.assign(of, dados);
+  } else {
+    oficinaFormAtualId = proximoIdOficina++;
+    oficinas.push({id:oficinaFormAtualId, fotoDataUrl:null, ...dados});
+  }
+  fotoFormPendente = null;
+  document.getElementById('ofFeedback').textContent='✓ Oficina salva.';
+  salvarEstado();
+  recalcularOrdemPorDistancia();
+  mostrarToast('Oficina salva com sucesso.','sucesso');
+  voltar();
+}
+
+if('serviceWorker' in navigator){
+  const swCode = `
+    const CACHE = 'equipecas-rotas-v2';
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./'])));
+      self.skipWaiting();
+    });
+    self.addEventListener('activate', e => {
+      e.waitUntil(caches.keys().then(keys =>
+        Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+      ));
+      self.clients.claim();
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(
+        caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('./')))
+      );
+    });
+  `;
+  const blob = new Blob([swCode], {type:'application/javascript'});
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(err => {
+    console.warn('Service Worker não registrado (normal em file://):', err);
+  });
+}
+
+(function initOrigemLista(){
+  const sel = document.getElementById('selOrigemLista');
+  if(sel) sel.value = isMobileDevice() ? 'gps' : 'sede';
+})();
+recalcularOrdemPorDistancia();
+mostrarPagina('inicio');
+</script>
+</body>
+</html>
