@@ -144,14 +144,18 @@ select.sel{
   background:var(--fundo-card); border:1px solid var(--borda); border-radius:12px;
   padding:14px 16px; margin-bottom:10px;
 }
-.card-oficina .cabecalho{ display:flex; align-items:flex-start; gap:10px; }
+.card-oficina .cabecalho{ display:flex; align-items:flex-start; gap:10px; cursor:pointer; }
 .card-oficina .info{ flex:1; min-width:0; }
-.card-oficina .nome{ font-weight:700; font-size:15px; margin:0 0 2px 0; }
+.card-oficina .nome{ font-weight:700; font-size:15px; margin:0 0 2px 0; display:flex; align-items:center; gap:2px; }
+.card-oficina .nome .seta{ margin-left:auto; flex-shrink:0; color:var(--texto-sec); font-size:12px; transition:transform .2s; padding-left:6px; }
+.card-oficina.aberto .nome .seta{ transform:rotate(180deg); }
 .card-oficina .meta{ font-size:12.5px; color:var(--texto-sec); }
 .card-oficina .distancia{
   flex-shrink:0; font-size:12px; font-weight:700; color:var(--primaria);
   background:rgba(59,130,246,.12); padding:4px 8px; border-radius:6px;
 }
+.card-oficina .detalhes{ display:none; }
+.card-oficina.aberto .detalhes{ display:block; }
 .card-oficina .acoes{ display:flex; gap:8px; margin-top:12px; }
 .card-oficina .acoes .btn{ flex:1; }
 
@@ -194,6 +198,28 @@ hr{ border:none; border-top:1px solid var(--borda); margin:16px 0; }
 .linha-form-dupla{ display:flex; gap:8px; }
 .linha-form-dupla > div{ flex:1; }
 .linha-form-dupla > div.estreita{ flex:0 0 68px; }
+
+#btnConfigTopo{
+  background:none; border:none; color:var(--texto); font-size:20px;
+  width:40px; height:40px; border-radius:20px; display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+#btnConfigTopo:active{ background:var(--fundo-card-hover); }
+
+.oculto{ display:none !important; }
+.modal-overlay{
+  position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:500;
+  display:flex; align-items:center; justify-content:center; padding:20px;
+}
+.modal-caixa{
+  background:var(--fundo-card); border:1px solid var(--borda); border-radius:14px;
+  padding:20px; max-width:420px; width:100%; max-height:85vh; overflow-y:auto;
+}
+.modal-caixa h2{ margin:0 0 4px 0; font-size:17px; }
+.modal-caixa .legenda{ margin-bottom:10px; }
+.modal-caixa .linha-btns{ margin-top:10px; }
+.modal-caixa .btn{ margin-top:8px; }
+.modal-caixa .btn:first-of-type{ margin-top:14px; }
 </style>
 </head>
 <body>
@@ -202,6 +228,7 @@ hr{ border:none; border-top:1px solid var(--borda); margin:16px 0; }
   <div id="topbar">
     <button id="btnVoltarTopo" onclick="voltar()">←</button>
     <div id="tituloTopo">Equipeças Rotas</div>
+    <button id="btnConfigTopo" onclick="abrirModalSenha()" title="Configurações">⚙️</button>
   </div>
 
   <div id="paginas">
@@ -292,7 +319,10 @@ hr{ border:none; border-top:1px solid var(--borda); margin:16px 0; }
       <div class="legenda" id="labelOrigemLista" style="margin-top:6px;"></div>
 
       <input type="search" placeholder="Pesquisar por nome, cidade ou endereço..." id="buscaOficinas" oninput="renderListaOficinas(false)" style="margin-top:12px;">
-      <button class="btn primario" style="margin-top:10px;" onclick="novaOficinaForm()">+ Nova oficina</button>
+      <div class="linha-btns" style="margin-top:10px;">
+        <button class="btn primario" onclick="novaOficinaForm()">+ Nova oficina</button>
+        <button class="btn pequeno" style="flex:0 0 auto;" onclick="abrirLixeira()">🗑️ Lixeira</button>
+      </div>
       <div id="listaOficinas" style="margin-top:12px;"></div>
     </div>
 
@@ -368,6 +398,75 @@ hr{ border:none; border-top:1px solid var(--borda); margin:16px 0; }
 
 <div class="toast" id="toast"></div>
 
+<!-- ===================== MODAL: SENHA ADMIN ===================== -->
+<div class="modal-overlay oculto" id="modalSenha">
+  <div class="modal-caixa">
+    <h2>🔒 Acesso restrito</h2>
+    <div class="legenda">Digite a senha de administrador para continuar.</div>
+    <input type="text" inputmode="numeric" id="inputSenhaAdmin" placeholder="Senha" autocomplete="off"
+      onkeydown="if(event.key==='Enter') validarSenhaAdmin();">
+    <div class="linha-btns">
+      <button class="btn primario" onclick="validarSenhaAdmin()">Entrar</button>
+      <button class="btn" onclick="fecharModalSenha()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL: PAINEL ADMIN ===================== -->
+<div class="modal-overlay oculto" id="modalAdmin">
+  <div class="modal-caixa">
+    <h2>⚙️ Painel de Configurações</h2>
+    <div class="legenda">Gerencie o backup local e o backup oficial na nuvem.</div>
+
+    <button class="btn" onclick="acionarSelecaoArquivoBackup()">📂 Restaurar Backup Local (Carregar Arquivo)</button>
+    <div class="legenda">Carrega oficinas de um arquivo .json/.txt salvo no dispositivo.</div>
+
+    <button class="btn sucesso" onclick="gerarPublicarBackupOficial()">☁️ Gerar e Publicar Backup Oficial</button>
+    <div class="legenda">Envia a lista atual para a nuvem (JSONBin) e baixa um arquivo backup_oficinas.json.</div>
+
+    <input type="file" id="inputArquivoBackup" accept=".json,.txt,application/json,text/plain" style="display:none" onchange="aoSelecionarArquivoBackup(event)">
+
+    <button class="btn" style="margin-top:16px;" onclick="fecharModalAdmin()">Fechar</button>
+  </div>
+</div>
+
+<!-- ===================== MODAL: OPÇÕES DE RESTAURAÇÃO ===================== -->
+<div class="modal-overlay oculto" id="modalRestaurarOpcoes">
+  <div class="modal-caixa">
+    <h2>📂 Restaurar Backup</h2>
+    <div class="legenda" id="labelQtdArquivoRestaurar"></div>
+    <div class="legenda">Como deseja aplicar os dados do arquivo?</div>
+
+    <button class="btn perigo" onclick="restaurarSubstituirTudo()">♻️ Substituir Tudo</button>
+    <div class="legenda">Apaga a lista atual e carrega 100% dos dados do arquivo.</div>
+
+    <button class="btn sucesso" onclick="restaurarMesclarNovos()">➕ Mesclar Novos</button>
+    <div class="legenda">Adiciona apenas as oficinas do arquivo que ainda não existem no sistema.</div>
+
+    <button class="btn" style="margin-top:16px;" onclick="fecharModalRestaurarOpcoes()">Cancelar</button>
+  </div>
+</div>
+
+<!-- ===================== MODAL: LIXEIRA DE OFICINAS ===================== -->
+<div class="modal-overlay oculto" id="modalLixeira">
+  <div class="modal-caixa">
+    <h2>🗑️ Lixeira de oficinas</h2>
+    <div class="legenda">Oficinas excluídas podem ser restauradas para o cadastro ativo.</div>
+
+    <label class="item-lista" style="border:1px solid var(--borda); border-radius:8px; margin-top:8px;">
+      <input type="checkbox" id="checkSelecionarTodasLixeira" onclick="alternarSelecionarTodasLixeira(this)">
+      <span class="txt">Selecionar todas</span>
+    </label>
+
+    <div class="lista-caixa" id="listaLixeira" style="margin-top:10px; max-height:320px; overflow-y:auto;"></div>
+
+    <div class="linha-btns">
+      <button class="btn sucesso" id="btnRestaurarSelecionadas" onclick="restaurarSelecionadasLixeira()">↩ Restaurar Selecionadas</button>
+      <button class="btn" onclick="fecharLixeira()">Fechar</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* =========================================================================
    Equipeças Rotas — app web mobile-first, arquivo único
@@ -397,6 +496,7 @@ let oficinas = [];
 let rotas = [];
 let rotaAtualId = null;
 let oficinaFormAtualId = null;
+let oficinaExpandidaId = null; /* controla o accordion da lista de oficinas */
 let fotoFormPendente = null;
 
 let gpsOrigem = { lat: null, lon: null, label: '' };
@@ -584,6 +684,13 @@ function haversine(a,b){
   const s = Math.sin(dLat/2)**2 + Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*Math.sin(dLng/2)**2;
   return R*2*Math.asin(Math.sqrt(Math.max(0,s)));
 }
+/** Verifica se um par de coordenadas é numérico e está dentro dos limites válidos de latitude/longitude. */
+function coordsValidas(lat, lng){
+  const la = +lat, ln = +lng;
+  return Number.isFinite(la) && Number.isFinite(ln) &&
+    la >= -90 && la <= 90 && ln >= -180 && ln <= 180 &&
+    !(la === 0 && ln === 0);
+}
 function distanciaTotal(pontos, ordem){
   let d=0;
   for(let i=0;i<ordem.length-1;i++) d += haversine(pontos[ordem[i]], pontos[ordem[i+1]]);
@@ -698,8 +805,9 @@ function resolverOrigemLista(){
 
 function recalcularOrdemPorDistancia(){
   const origem = resolverOrigemLista();
-  const comCoords = oficinas.filter(o => o.lat != null && o.lng != null);
-  const semCoords = oficinas.filter(o => o.lat == null || o.lng == null);
+  const ativas = oficinas.filter(o => !o.deletada);
+  const comCoords = ativas.filter(o => coordsValidas(o.lat, o.lng));
+  const semCoords = ativas.filter(o => !coordsValidas(o.lat, o.lng));
 
   comCoords.sort((a,b)=>{
     const da = haversine({lat:origem.lat, lng:origem.lon}, {lat:a.lat, lng:a.lng});
@@ -711,8 +819,9 @@ function recalcularOrdemPorDistancia(){
 }
 
 function distanciaOficina(of){
-  if(of.lat == null || of.lng == null) return null;
+  if(!coordsValidas(of.lat, of.lng)) return null;
   const origem = resolverOrigemLista();
+  if(!coordsValidas(origem.lat, origem.lon)) return null;
   return haversine({lat:origem.lat, lng:origem.lon}, {lat:of.lat, lng:of.lng});
 }
 
@@ -724,6 +833,7 @@ function mostrarPagina(nome){
   const raiz = PAGINAS_RAIZ.includes(nome);
   document.getElementById('btnVoltarTopo').classList.toggle('mostrar', !raiz);
   document.getElementById('bottombar').classList.toggle('oculta', !raiz);
+  document.getElementById('btnConfigTopo').classList.toggle('oculto', nome!=='inicio');
   document.querySelectorAll('.tab-btn').forEach(b=>{
     b.classList.toggle('ativo', raiz && b.dataset.raiz===nome);
   });
@@ -761,8 +871,9 @@ function voltar(){
 function atualizarLauncher(){
   document.getElementById('resumoRotasLauncher').textContent =
     `${rotas.length} rota${rotas.length!==1?'s':''} aberta${rotas.length!==1?'s':''}`;
+  const totalAtivas = oficinas.filter(o=>!o.deletada).length;
   document.getElementById('resumoOficinasLauncher').textContent =
-    `${oficinas.length} cadastrada${oficinas.length!==1?'s':''}`;
+    `${totalAtivas} cadastrada${totalAtivas!==1?'s':''}`;
 }
 
 const MAX_ROTAS = 10;
@@ -955,6 +1066,7 @@ function renderListaTodasRota(){
   const box = document.getElementById('listaTodasRota');
   box.innerHTML='';
   const filtradas = oficinas.filter(o=>{
+    if(o.deletada) return false;
     if(!busca) return true;
     return (o.nome||'').toLowerCase().includes(busca) ||
            (o.cidade||'').toLowerCase().includes(busca) ||
@@ -1032,7 +1144,7 @@ function capturarGPSParaOrigem(){
 
 async function otimizarRotaAtual(){
   const rota = rotas.find(r=>r.id===rotaAtualId);
-  const selecionadas = rota.oficinaIds.map(id=>oficinas.find(o=>o.id===id)).filter(o=>o && o.lat!=null && o.lng!=null);
+  const selecionadas = rota.oficinaIds.map(id=>oficinas.find(o=>o.id===id)).filter(o=>o && coordsValidas(o.lat, o.lng));
   if(selecionadas.length<2){
     mostrarToast('Selecione ao menos 2 oficinas com coordenadas para otimizar.','erro');
     return;
@@ -1188,11 +1300,11 @@ function renderListaOficinas(reordenar){
 
   let ordenadas = idsOrdenadosPorDistancia
     .map(id => oficinas.find(o => o.id === id))
-    .filter(Boolean);
+    .filter(o => o && !o.deletada);
 
   const idsNoCache = new Set(idsOrdenadosPorDistancia);
   oficinas.forEach(o=>{
-    if(!idsNoCache.has(o.id)) ordenadas.push(o);
+    if(!o.deletada && !idsNoCache.has(o.id)) ordenadas.push(o);
   });
 
   if(busca){
@@ -1210,26 +1322,36 @@ function renderListaOficinas(reordenar){
 
   ordenadas.forEach(of=>{
     const dist = distanciaOficina(of);
-    const distTxt = dist != null ? (dist < 10 ? dist.toFixed(1) : Math.round(dist)) + ' km' : '—';
+    const distTxt = dist != null ? ((dist < 10 ? dist.toFixed(1) : Math.round(dist)) + ' km') : '-- km';
+    const aberto = oficinaExpandidaId === of.id;
     const card = document.createElement('div');
-    card.className = 'card-oficina';
+    card.className = 'card-oficina' + (aberto ? ' aberto' : '');
     card.innerHTML = `
-      <div class="cabecalho">
+      <div class="cabecalho" onclick="alternarExpandirOficina(${of.id})">
         <div class="info">
           <div class="nome">${escapeHtml(of.nome)}
             ${of.verificada? '<span class="badge verificada">✓</span>':''}
             ${of.fotoDataUrl? '<span class="badge foto">📷</span>':''}
+            <span class="seta">▾</span>
           </div>
           <div class="meta">${of.cidade? escapeHtml(of.cidade)+(of.estado? ' — '+escapeHtml(of.estado):'') : (of.endereco? escapeHtml(of.endereco):'Sem cidade')}</div>
         </div>
         <div class="distancia">${distTxt}</div>
       </div>
-      <div class="acoes">
-        <button class="btn pequeno" onclick="editarOficina(${of.id})">✏️ Editar</button>
-        <button class="btn perigo pequeno" onclick="excluirOficinaDireto(${of.id}, '${escapeAttr(of.nome)}')">🗑️ Excluir</button>
+      <div class="detalhes">
+        <div class="acoes">
+          <button class="btn pequeno" onclick="event.stopPropagation(); editarOficina(${of.id})">✏️ Editar</button>
+          <button class="btn perigo pequeno" onclick="event.stopPropagation(); excluirOficinaDireto(${of.id}, '${escapeAttr(of.nome)}')">🗑️ Excluir</button>
+        </div>
       </div>`;
     box.appendChild(card);
   });
+}
+
+/** Controla o accordion: expande a oficina tocada e fecha qualquer outra que estivesse aberta. */
+function alternarExpandirOficina(id){
+  oficinaExpandidaId = (oficinaExpandidaId === id) ? null : id;
+  renderListaOficinas(false);
 }
 
 function editarOficina(id){
@@ -1238,13 +1360,15 @@ function editarOficina(id){
 }
 
 function excluirOficinaDireto(id, nome){
-  if(!confirm(`Excluir "${nome}" do cadastro?\n\nEsta ação não pode ser desfeita.`)) return;
-  oficinas = oficinas.filter(o=>o.id!==id);
+  if(!confirm(`Mover "${nome}" para a lixeira?\n\nVocê pode restaurá-la depois em Oficinas → Lixeira.`)) return;
+  const of = oficinas.find(o=>o.id===id);
+  if(!of) return;
+  of.deletada = true;
   rotas.forEach(r=> r.oficinaIds = r.oficinaIds.filter(oid=>oid!==id));
   salvarEstado();
   recalcularOrdemPorDistancia();
   renderListaOficinas(false);
-  mostrarToast('Oficina excluída.','sucesso');
+  mostrarToast('Oficina movida para a lixeira.','sucesso');
 }
 
 function novaOficinaForm(){
@@ -1398,7 +1522,7 @@ function salvarOficina(){
     Object.assign(of, dados);
   } else {
     oficinaFormAtualId = proximoIdOficina++;
-    oficinas.push({id:oficinaFormAtualId, fotoDataUrl:null, ...dados});
+    oficinas.push({id:oficinaFormAtualId, fotoDataUrl:null, deletada:false, ...dados});
   }
   fotoFormPendente = null;
   document.getElementById('ofFeedback').textContent='✓ Oficina salva.';
@@ -1406,6 +1530,254 @@ function salvarOficina(){
   recalcularOrdemPorDistancia();
   mostrarToast('Oficina salva com sucesso.','sucesso');
   voltar();
+}
+
+/* =========================================================================
+   PAINEL DE CONFIGURAÇÕES ADMINISTRATIVAS (protegido por senha)
+========================================================================= */
+const SENHA_ADMIN = '3003';
+let _arquivoRestaurarDados = null;
+
+function abrirModalSenha(){
+  document.getElementById('inputSenhaAdmin').value = '';
+  document.getElementById('modalSenha').classList.remove('oculto');
+  setTimeout(()=>{ document.getElementById('inputSenhaAdmin').focus(); }, 50);
+}
+function fecharModalSenha(){
+  document.getElementById('modalSenha').classList.add('oculto');
+}
+function validarSenhaAdmin(){
+  const valor = document.getElementById('inputSenhaAdmin').value;
+  if(valor === SENHA_ADMIN){
+    fecharModalSenha();
+    abrirModalAdmin();
+  } else {
+    alert('Senha incorreta.');
+  }
+}
+
+function abrirModalAdmin(){
+  document.getElementById('modalAdmin').classList.remove('oculto');
+}
+function fecharModalAdmin(){
+  document.getElementById('modalAdmin').classList.add('oculto');
+}
+
+function acionarSelecaoArquivoBackup(){
+  document.getElementById('inputArquivoBackup').click();
+}
+
+/** Converte oficinas de um backup externo (ex.: exportação do app MOTORISTA)
+ *  para o formato interno usado por este app. */
+function normalizarOficinasBackup(json){
+  let arr = [];
+  if(Array.isArray(json)) arr = json;
+  else if(json && Array.isArray(json.oficinas)) arr = json.oficinas;
+  else return [];
+
+  return arr.map(o=>({
+    nome: (o.nome || o.name || '').toString().trim(),
+    endereco: o.endereco || null,
+    cidade: o.cidade || null,
+    estado: o.estado || null,
+    telefone: o.telefone || null,
+    mapsLink: o.mapsLink || o.maps_link || '',
+    lat: (o.lat != null ? +o.lat : (o.latitude != null ? +o.latitude : null)),
+    lng: (o.lng != null ? +o.lng : (o.longitude != null ? +o.longitude : null)),
+    verificada: !!(o.verificada),
+    fotoDataUrl: o.fotoDataUrl || null,
+    deletada: false,
+  })).filter(o=>o.nome);
+}
+
+function aoSelecionarArquivoBackup(ev){
+  const arquivo = ev.target.files[0];
+  ev.target.value = '';
+  if(!arquivo) return;
+
+  const leitor = new FileReader();
+  leitor.onload = ()=>{
+    try{
+      const json = JSON.parse(leitor.result);
+      const lista = normalizarOficinasBackup(json);
+      if(!lista.length){
+        alert('Nenhuma oficina válida foi encontrada no arquivo selecionado.');
+        return;
+      }
+      _arquivoRestaurarDados = lista;
+      document.getElementById('modalAdmin').classList.add('oculto');
+      document.getElementById('labelQtdArquivoRestaurar').textContent =
+        `${lista.length} oficina(s) encontradas no arquivo selecionado.`;
+      document.getElementById('modalRestaurarOpcoes').classList.remove('oculto');
+    }catch(e){
+      console.error('Erro ao interpretar arquivo de backup:', e);
+      alert('Não foi possível ler o arquivo selecionado. Verifique se é um .json válido.');
+    }
+  };
+  leitor.onerror = ()=>{
+    alert('Erro ao ler o arquivo selecionado.');
+  };
+  leitor.readAsText(arquivo);
+}
+
+function fecharModalRestaurarOpcoes(){
+  document.getElementById('modalRestaurarOpcoes').classList.add('oculto');
+  _arquivoRestaurarDados = null;
+}
+
+function restaurarSubstituirTudo(){
+  if(!_arquivoRestaurarDados) return;
+  if(!confirm('Isso vai apagar TODAS as oficinas atuais e substituir pelas do arquivo selecionado. Deseja continuar?')) return;
+  oficinas = _arquivoRestaurarDados.map(o=>({ id: proximoIdOficina++, ...o }));
+  rotas.forEach(r=> r.oficinaIds = []);
+  finalizarRestauracao(`Backup restaurado: ${oficinas.length} oficina(s) carregadas.`);
+}
+
+function restaurarMesclarNovos(){
+  if(!_arquivoRestaurarDados) return;
+  const chaveOficina = o => (o.nome||'').trim().toLowerCase() + '|' + (o.endereco||'').trim().toLowerCase();
+  const existentes = new Set(oficinas.map(chaveOficina));
+  let adicionadas = 0;
+  _arquivoRestaurarDados.forEach(o=>{
+    const chave = chaveOficina(o);
+    if(!existentes.has(chave)){
+      oficinas.push({ id: proximoIdOficina++, ...o });
+      existentes.add(chave);
+      adicionadas++;
+    }
+  });
+  finalizarRestauracao(`${adicionadas} nova(s) oficina(s) adicionada(s) ao cadastro.`);
+}
+
+function finalizarRestauracao(mensagem){
+  fecharModalRestaurarOpcoes();
+  salvarEstado();
+  recalcularOrdemPorDistancia();
+  atualizarLauncher();
+  const pg = document.querySelector('.pagina.ativa');
+  if(pg && pg.id === 'pagina-oficinas') renderListaOficinas(false);
+  mostrarToast(mensagem, 'sucesso');
+}
+
+/** Publica a lista mestre no JSONBin (nuvem) e baixa um arquivo local de backup. */
+function gerarPublicarBackupOficial(){
+  const payload = {
+    proximoIdOficina, proximoIdRota,
+    oficinas, rotas,
+    salvo_em: new Date().toISOString()
+  };
+
+  if(NUVEM_API_KEY && NUVEM_API_KEY !== 'SUA_CHAVE_API_AQUI' &&
+     NUVEM_BIN_ID  && NUVEM_BIN_ID  !== 'SEU_BIN_ID_AQUI'){
+    fetch(`https://api.jsonbin.io/v3/b/${NUVEM_BIN_ID}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': NUVEM_API_KEY },
+      body: JSON.stringify(payload)
+    })
+    .then(res=>{
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      return res.json();
+    })
+    .then(()=>{
+      console.log('Backup oficial publicado na nuvem.');
+      mostrarToast('Backup publicado na nuvem com sucesso.','sucesso');
+    })
+    .catch(err=>{
+      console.error('Erro ao publicar backup oficial na nuvem:', err);
+      mostrarToast('⚠ Falha ao publicar backup na nuvem.','erro');
+    });
+  } else {
+    mostrarToast('⚠ Nuvem não configurada — apenas o download local foi gerado.','erro');
+  }
+
+  try{
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'backup_oficinas.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url), 4000);
+  }catch(e){
+    console.error('Erro ao gerar arquivo de download do backup:', e);
+    mostrarToast('⚠ Não foi possível gerar o arquivo de download.','erro');
+  }
+
+  fecharModalAdmin();
+}
+
+/* =========================================================================
+   LIXEIRA DE OFICINAS EXCLUÍDAS
+========================================================================= */
+function abrirLixeira(){
+  renderListaLixeira();
+  document.getElementById('modalLixeira').classList.remove('oculto');
+}
+function fecharLixeira(){
+  document.getElementById('modalLixeira').classList.add('oculto');
+}
+
+function renderListaLixeira(){
+  const box = document.getElementById('listaLixeira');
+  box.innerHTML = '';
+  document.getElementById('checkSelecionarTodasLixeira').checked = false;
+
+  const excluidas = oficinas.filter(o=>o.deletada);
+  if(excluidas.length===0){
+    box.innerHTML = '<div class="vazio">Nenhuma oficina na lixeira.</div>';
+    document.getElementById('btnRestaurarSelecionadas').disabled = true;
+    return;
+  }
+  document.getElementById('btnRestaurarSelecionadas').disabled = false;
+
+  excluidas.forEach(of=>{
+    const linha = document.createElement('div');
+    linha.className = 'item-lista';
+    linha.innerHTML = `
+      <input type="checkbox" class="chk-lixeira" data-id="${of.id}">
+      <span class="txt">${escapeHtml(of.nome)}${of.cidade? ' — '+escapeHtml(of.cidade):''}</span>
+      <button class="btn pequeno" style="flex-shrink:0; width:auto;" onclick="restaurarOficina(${of.id})">↩ Restaurar</button>`;
+    box.appendChild(linha);
+  });
+}
+
+function alternarSelecionarTodasLixeira(checkbox){
+  document.querySelectorAll('.chk-lixeira').forEach(c=> c.checked = checkbox.checked);
+}
+
+function restaurarOficina(id){
+  const of = oficinas.find(o=>o.id===id);
+  if(!of) return;
+  of.deletada = false;
+  salvarEstado();
+  recalcularOrdemPorDistancia();
+  renderListaLixeira();
+  renderListaOficinas(false);
+  atualizarLauncher();
+  mostrarToast('Oficina restaurada.','sucesso');
+}
+
+function restaurarSelecionadasLixeira(){
+  const marcadas = document.getElementById('checkSelecionarTodasLixeira').checked
+    ? oficinas.filter(o=>o.deletada).map(o=>o.id)
+    : Array.from(document.querySelectorAll('.chk-lixeira:checked')).map(c=>+c.dataset.id);
+
+  if(marcadas.length===0){
+    mostrarToast('Selecione ao menos uma oficina para restaurar.','erro');
+    return;
+  }
+  marcadas.forEach(id=>{
+    const of = oficinas.find(o=>o.id===id);
+    if(of) of.deletada = false;
+  });
+  salvarEstado();
+  recalcularOrdemPorDistancia();
+  renderListaLixeira();
+  renderListaOficinas(false);
+  atualizarLauncher();
+  mostrarToast(`${marcadas.length} oficina(s) restaurada(s).`,'sucesso');
 }
 
 if('serviceWorker' in navigator){
