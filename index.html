@@ -4,141 +4,182 @@
 <meta charset="UTF-8">
 <title>Equipeças Rotas</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#0F1115">
+<meta name="theme-color" content="#0F172A">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Equipeças Rotas">
 <meta name="description" content="Gestão de oficinas e expedições — Equipeças">
-<link rel="manifest" href="data:application/manifest+json,{"name":"Equipe%C3%A7as%20Rotas","short_name":"Equipe%C3%A7as","start_url":".","display":"standalone","background_color":"%230F1115","theme_color":"%230F1115","lang":"pt-BR","icons":[{"src":"data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20192%20192%27%3E%3Crect%20width%3D%27192%27%20height%3D%27192%27%20rx%3D%2732%27%20fill%3D%27%233B82F6%27%2F%3E%3Ctext%20x%3D%2796%27%20y%3D%27120%27%20font-size%3D%2790%27%20text-anchor%3D%27middle%27%20fill%3D%27white%27%3E%F0%9F%9A%9A%3C%2Ftext%3E%3C%2Fsvg%3E","sizes":"192x192","type":"image/svg+xml"},{"src":"data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20512%20512%27%3E%3Crect%20width%3D%27512%27%20height%3D%27512%27%20rx%3D%2796%27%20fill%3D%27%233B82F6%27%2F%3E%3Ctext%20x%3D%27256%27%20y%3D%27320%27%20font-size%3D%27240%27%20text-anchor%3D%27middle%27%20fill%3D%27white%27%3E%F0%9F%9A%9A%3C%2Ftext%3E%3C%2Fsvg%3E","sizes":"512x512","type":"image/svg+xml"}]}">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%232563EB'/%3E%3Cpath d='M48 120h96M64 120V88l32-24 32 24v32M80 120v-24h32v24' stroke='white' stroke-width='10' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Ccircle cx='80' cy='132' r='10' fill='white'/%3E%3Ccircle cx='112' cy='132' r='10' fill='white'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%232563EB'/%3E%3Cpath d='M48 120h96M64 120V88l32-24 32 24v32M80 120v-24h32v24' stroke='white' stroke-width='10' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Ccircle cx='80' cy='132' r='10' fill='white'/%3E%3Ccircle cx='112' cy='132' r='10' fill='white'/%3E%3C/svg%3E">
+<link rel="manifest" href="data:application/manifest+json,{"name":"Equipe%C3%A7as%20Rotas","short_name":"Equipe%C3%A7as","start_url":".","display":"standalone","background_color":"%230F172A","theme_color":"%230F172A","lang":"pt-BR","icons":[{"src":"data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20192%20192%27%3E%3Crect%20width%3D%27192%27%20height%3D%27192%27%20rx%3D%2740%27%20fill%3D%27%232563EB%27%2F%3E%3Cpath%20d%3D%27M48%20120h96M64%20120V88l32-24%2032%2024v32M80%20120v-24h32v24%27%20stroke%3D%27white%27%20stroke-width%3D%2710%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20fill%3D%27none%27%2F%3E%3Ccircle%20cx%3D%2780%27%20cy%3D%27132%27%20r%3D%2710%27%20fill%3D%27white%27%2F%3E%3Ccircle%20cx%3D%27112%27%20cy%3D%27132%27%20r%3D%2710%27%20fill%3D%27white%27%2F%3E%3C%2Fsvg%3E","sizes":"192x192","type":"image/svg+xml"},{"src":"data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20512%20512%27%3E%3Crect%20width%3D%27512%27%20height%3D%27512%27%20rx%3D%27104%27%20fill%3D%27%232563EB%27%2F%3E%3Cpath%20d%3D%27M128%20320h256M170%20320V235l86-64%2086%2064v85M213%20320v-64h86v64%27%20stroke%3D%27white%27%20stroke-width%3D%2726%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20fill%3D%27none%27%2F%3E%3Ccircle%20cx%3D%27213%27%20cy%3D%27352%27%20r%3D%2726%27%20fill%3D%27white%27%2F%3E%3Ccircle%20cx%3D%27299%27%20cy%3D%27352%27%20r%3D%2726%27%20fill%3D%27white%27%2F%3E%3C%2Fsvg%3E","sizes":"512x512","type":"image/svg+xml"}]}">
 <style>
 :root{
-  --fundo:#0F1115;
-  --fundo-card:#171A21;
-  --fundo-card-hover:#1D212B;
-  --borda:#2A2F3A;
-  --primaria:#3B82F6;
-  --primaria-hover:#2563EB;
+  --fundo:#0F172A;
+  --fundo-card:#1E293B;
+  --fundo-card-hover:#273549;
+  --borda:#334155;
+  --primaria:#2563EB;
+  --primaria-hover:#1D4ED8;
   --sucesso:#22C55E;
   --perigo:#EF4444;
   --alerta:#F59E0B;
-  --texto:#E6E8EC;
-  --texto-sec:#9AA3AF;
-  --texto-desab:#5B6370;
+  --texto:#F8FAFC;
+  --texto-sec:#94A3B8;
+  --texto-desab:#64748B;
   --topbar-h:52px;
-  --bottombar-h:62px;
+  --bottombar-h:64px;
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
 html,body{height:100%;margin:0;}
 body{
-  background:#000;
+  background:#020617;
   color:var(--texto);
-  font-family:"Segoe UI",Inter,Arial,sans-serif;
+  font-family:Inter,"Segoe UI",system-ui,-apple-system,sans-serif;
   font-size:15px;
+  -webkit-font-smoothing:antialiased;
 }
 button{font-family:inherit;cursor:pointer;}
 input,select,textarea{font-family:inherit;}
-::-webkit-scrollbar{width:8px;height:8px;}
-::-webkit-scrollbar-thumb{background:var(--borda);border-radius:4px;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-thumb{background:var(--borda);border-radius:3px;}
 
 #app{
   max-width:480px; margin:0 auto; min-height:100vh;
   background:var(--fundo); position:relative;
   display:flex; flex-direction:column;
-  box-shadow:0 0 40px rgba(0,0,0,.6);
+  box-shadow:0 0 48px rgba(0,0,0,.55);
 }
 
 #topbar{
   position:sticky; top:0; z-index:30; height:var(--topbar-h);
   background:var(--fundo-card); border-bottom:1px solid var(--borda);
-  display:flex; align-items:center; padding:0 6px; gap:4px;
+  display:flex; align-items:center; padding:0 8px; gap:4px;
 }
 #btnVoltarTopo{
-  background:none; border:none; color:var(--texto); font-size:22px;
+  background:none; border:none; color:var(--texto);
   width:40px; height:40px; border-radius:20px; display:flex; align-items:center; justify-content:center;
-  visibility:hidden;
+  visibility:hidden; padding:0;
 }
 #btnVoltarTopo.mostrar{ visibility:visible; }
 #btnVoltarTopo:active{ background:var(--fundo-card-hover); }
-#tituloTopo{ font-size:16px; font-weight:600; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#btnVoltarTopo svg{ width:22px; height:22px; }
+#tituloTopo{ font-size:16px; font-weight:600; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; letter-spacing:-.01em; }
 
 #paginas{ flex:1; overflow:hidden; position:relative; }
 .pagina{
   display:none; position:absolute; inset:0; overflow-y:auto;
   padding:16px 16px calc(var(--bottombar-h) + 24px) 16px;
+  -webkit-overflow-scrolling:touch;
 }
 .pagina.ativa{ display:block; }
 
 #bottombar{
   position:sticky; bottom:0; z-index:30; height:var(--bottombar-h);
   background:var(--fundo-card); border-top:1px solid var(--borda);
-  display:flex;
+  display:flex; padding:0 4px;
+  padding-bottom:env(safe-area-inset-bottom, 0);
 }
 #bottombar.oculta{ display:none; }
 .tab-btn{
   flex:1; background:none; border:none; color:var(--texto-sec);
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
-  font-size:10.5px; padding:4px 0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+  font-size:10.5px; font-weight:500; padding:6px 0 4px; position:relative;
+  transition:color .15s ease;
 }
-.tab-btn .ic{ font-size:19px; }
+.tab-btn .ic{ display:flex; align-items:center; justify-content:center; width:24px; height:24px; }
+.tab-btn .ic svg{ width:22px; height:22px; stroke-width:1.75; }
 .tab-btn.ativo{ color:var(--primaria); }
+.tab-btn.ativo::after{
+  content:''; position:absolute; top:0; left:50%; transform:translateX(-50%);
+  width:20px; height:3px; border-radius:0 0 3px 3px; background:var(--primaria);
+}
 
-h1.titulo-pagina{ font-size:21px; font-weight:700; margin:2px 0 4px 0; }
-.legenda{ font-size:12.5px; color:var(--texto-sec); line-height:1.4; }
-.subtitulo{ font-size:12px; font-weight:700; color:var(--texto-sec); letter-spacing:.4px;
-  text-transform:uppercase; margin:16px 0 6px 0;}
+h1.titulo-pagina{ font-size:22px; font-weight:700; margin:2px 0 6px 0; letter-spacing:-.02em; color:var(--texto); }
+.legenda{ font-size:12.5px; color:var(--texto-sec); line-height:1.45; }
+.subtitulo{ font-size:11.5px; font-weight:600; color:var(--texto-sec); letter-spacing:.5px;
+  text-transform:uppercase; margin:18px 0 8px 0;}
 
-.btn{ background:var(--fundo-card); color:var(--texto); border:1px solid var(--borda);
-  border-radius:8px; padding:11px 16px; font-size:14.5px; width:100%; }
-.btn:active{ background:var(--fundo-card-hover); }
-.btn:disabled{ color:var(--texto-desab); }
+.btn{
+  background:var(--fundo-card); color:var(--texto); border:1px solid var(--borda);
+  border-radius:10px; padding:12px 16px; font-size:14.5px; font-weight:500; width:100%;
+  transition:transform .12s ease, background .12s ease;
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  line-height:1.25; min-height:44px; box-sizing:border-box;
+}
+.btn:active{ background:var(--fundo-card-hover); transform:scale(0.98); }
+.btn:disabled{ color:var(--texto-desab); opacity:.65; transform:none; }
 .btn.primario{ background:var(--primaria); border:none; color:#fff; font-weight:600; }
-.btn.sucesso{ background:var(--sucesso); border:none; color:#06210F; font-weight:600; }
+.btn.primario:active{ background:var(--primaria-hover); transform:scale(0.98); }
+.btn.sucesso{ background:var(--sucesso); border:none; color:#052e16; font-weight:600; }
+.btn.sucesso:active{ transform:scale(0.98); }
 .btn.perigo{ background:transparent; border:1px solid var(--perigo); color:var(--perigo); }
-.btn.pequeno{ width:auto; padding:8px 12px; font-size:13px; }
+.btn.perigo:active{ background:rgba(239,68,68,.12); transform:scale(0.98); }
+.btn.pequeno{ width:auto; padding:8px 12px; font-size:13px; min-height:36px; }
+.btn svg{ width:18px; height:18px; flex-shrink:0; }
+.btn.pequeno svg{ width:16px; height:16px; }
 .linha-btns{ display:flex; gap:8px; }
 .linha-btns .btn{ flex:1; }
+.card-oficina .acoes .btn{
+  padding:10px 12px; font-size:13px; min-height:40px;
+}
+.card-oficina .acoes .btn svg{ width:16px; height:16px; }
 
 input[type=text], input[type=search], input[type=file]{
-  background:var(--fundo); border:1px solid var(--borda); border-radius:8px;
-  padding:11px 12px; color:var(--texto); width:100%; font-size:15px;
+  background:var(--fundo); border:1px solid var(--borda); border-radius:10px;
+  padding:12px 14px; color:var(--texto); width:100%; font-size:15px;
+  transition:border-color .15s ease;
 }
-input:focus{ outline:none; border-color:var(--primaria); }
-label.rotulo{ display:block; margin:12px 0 5px 0; color:var(--texto-sec); font-size:12.5px;}
+input:focus{ outline:none; border-color:var(--primaria); box-shadow:0 0 0 3px rgba(37,99,235,.18); }
+label.rotulo{ display:block; margin:14px 0 6px 0; color:var(--texto-sec); font-size:12.5px; font-weight:500;}
 select.sel{
-  background:var(--fundo); border:1px solid var(--borda); border-radius:8px;
-  padding:11px 12px; color:var(--texto); width:100%; font-size:15px;
+  background:var(--fundo); border:1px solid var(--borda); border-radius:10px;
+  padding:12px 14px; color:var(--texto); width:100%; font-size:15px;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 12px center;
+  padding-right:36px;
 }
+select.sel:focus{ outline:none; border-color:var(--primaria); box-shadow:0 0 0 3px rgba(37,99,235,.18); }
 
 .card{ background:var(--fundo-card); border:1px solid var(--borda); border-radius:12px;
   padding:16px; margin-bottom:12px; }
 .card h3{ margin:0 0 4px 0; font-size:15px; }
 
-.grid-launcher{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px; }
+.grid-launcher{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:18px; }
 .card-launcher{
   background:var(--fundo-card); border:1px solid var(--borda); border-radius:14px;
   padding:18px 14px; text-align:left; display:flex; flex-direction:column; gap:8px;
+  transition:background .12s ease, transform .12s ease;
 }
-.card-launcher:active{ background:var(--fundo-card-hover); }
-.card-launcher .ic{ font-size:26px; }
-.card-launcher .nome{ font-weight:700; font-size:14.5px; }
-.card-launcher .desc{ font-size:11.5px; color:var(--texto-sec); line-height:1.3; }
+.card-launcher:active{ background:var(--fundo-card-hover); transform:scale(0.98); }
+.card-launcher .ic{
+  width:40px; height:40px; border-radius:10px;
+  background:rgba(37,99,235,.14); color:var(--primaria);
+  display:flex; align-items:center; justify-content:center;
+}
+.card-launcher .ic svg{ width:22px; height:22px; }
+.card-launcher .nome{ font-weight:700; font-size:14.5px; color:var(--texto); }
+.card-launcher .desc{ font-size:11.5px; color:var(--texto-sec); line-height:1.35; }
 
 .card-rota{
   background:var(--fundo-card); border:1px solid var(--borda); border-radius:12px;
   padding:14px 16px; margin-bottom:12px;
 }
-.card-rota h3{ margin:0 0 4px 0; font-size:16px; font-weight:700; }
-.card-rota .status{ font-weight:700; font-size:12.5px; margin-top:2px; }
+.card-rota h3{ margin:0 0 4px 0; font-size:16px; font-weight:700; color:var(--texto); }
+.card-rota .status{
+  display:inline-block; font-weight:600; font-size:11.5px; margin-top:6px;
+  padding:3px 10px; border-radius:9999px; background:rgba(148,163,184,.12);
+}
 .card-rota .botoes{ display:flex; gap:8px; margin-top:12px; }
 .vazio{ text-align:center; color:var(--texto-sec); padding:50px 12px; white-space:pre-line; font-size:14px;}
 
-.lista-caixa{ background:var(--fundo-card); border:1px solid var(--borda); border-radius:10px; overflow:hidden; }
-.item-lista{ padding:12px; border-bottom:1px solid var(--borda); display:flex; align-items:center; gap:10px; }
+.lista-caixa{ background:var(--fundo-card); border:1px solid var(--borda); border-radius:12px; overflow:hidden; }
+.item-lista{ padding:12px 14px; border-bottom:1px solid var(--borda); display:flex; align-items:center; gap:10px; }
 .item-lista:last-child{ border-bottom:none; }
 .item-lista:active{ background:var(--fundo-card-hover); }
 .item-lista .txt{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.item-lista input[type=checkbox]{ width:20px; height:20px; flex-shrink:0; }
+.item-lista input[type=checkbox]{ width:18px; height:18px; flex-shrink:0; accent-color:var(--primaria); }
 
 .card-oficina{
   background:var(--fundo-card); border:1px solid var(--borda); border-radius:12px;
@@ -146,13 +187,17 @@ select.sel{
 }
 .card-oficina .cabecalho{ display:flex; align-items:flex-start; gap:10px; cursor:pointer; }
 .card-oficina .info{ flex:1; min-width:0; }
-.card-oficina .nome{ font-weight:700; font-size:15px; margin:0 0 2px 0; display:flex; align-items:center; gap:2px; }
-.card-oficina .nome .seta{ margin-left:auto; flex-shrink:0; color:var(--texto-sec); font-size:12px; transition:transform .2s; padding-left:6px; }
+.card-oficina .nome{ font-weight:700; font-size:15px; margin:0 0 3px 0; display:flex; align-items:center; gap:4px; color:var(--texto); }
+.card-oficina .nome .seta{
+  margin-left:auto; flex-shrink:0; color:var(--texto-sec);
+  display:flex; transition:transform .2s ease; padding-left:6px;
+}
+.card-oficina .nome .seta svg{ width:16px; height:16px; }
 .card-oficina.aberto .nome .seta{ transform:rotate(180deg); }
 .card-oficina .meta{ font-size:12.5px; color:var(--texto-sec); }
 .card-oficina .distancia{
-  flex-shrink:0; font-size:12px; font-weight:700; color:var(--primaria);
-  background:rgba(59,130,246,.12); padding:4px 8px; border-radius:6px;
+  flex-shrink:0; font-size:11.5px; font-weight:600; color:var(--primaria);
+  background:rgba(37,99,235,.14); padding:4px 10px; border-radius:9999px;
 }
 .card-oficina .detalhes{ display:none; }
 .card-oficina.aberto .detalhes{ display:block; }
@@ -160,33 +205,40 @@ select.sel{
 .card-oficina .acoes .btn{ flex:1; }
 
 .chip-remover{
-  width:26px;height:26px;border-radius:13px;border:none; flex-shrink:0;
-  background:transparent;color:var(--texto-sec);font-weight:700;font-size:16px;line-height:1;
+  width:28px;height:28px;border-radius:14px;border:none; flex-shrink:0;
+  background:transparent;color:var(--texto-sec); display:flex; align-items:center; justify-content:center;
+  padding:0;
 }
 .chip-remover:active{ background:var(--perigo); color:#fff; }
+.chip-remover svg{ width:16px; height:16px; }
 
-.badge{ display:inline-block; font-size:10.5px; padding:2px 6px; border-radius:5px; margin-left:4px; }
+.badge{
+  display:inline-flex; align-items:center; gap:2px;
+  font-size:10.5px; font-weight:600; padding:2px 8px; border-radius:9999px; margin-left:4px;
+}
 .badge.foto{ background:#334155; color:#cbd5e1; }
-.badge.verificada{ background:#14532d; color:#86efac; }
+.badge.verificada{ background:rgba(34,197,94,.15); color:#86efac; }
 
 #tituloRotaEdit{
   font-size:19px; font-weight:700; background:transparent; border:1px solid transparent;
-  border-radius:8px; padding:6px 8px; color:var(--texto); width:100%; margin-bottom:4px;
+  border-radius:10px; padding:6px 8px; color:var(--texto); width:100%; margin-bottom:4px;
+  letter-spacing:-.01em;
 }
-#tituloRotaEdit:focus{ border-color:var(--primaria); background:var(--fundo-card); outline:none;}
+#tituloRotaEdit:focus{ border-color:var(--primaria); background:var(--fundo-card); outline:none; box-shadow:0 0 0 3px rgba(37,99,235,.18); }
 
 .foto-preview{
-  width:88px;height:88px;border:1px solid var(--borda);border-radius:10px;
+  width:88px;height:88px;border:1px solid var(--borda);border-radius:12px;
   display:flex;align-items:center;justify-content:center;overflow:hidden;
   color:var(--texto-sec); font-size:11px; text-align:center; flex-shrink:0;
+  background:var(--fundo);
 }
 .foto-preview img{ width:100%; height:100%; object-fit:cover; }
 
 .toast{
   position:fixed; left:50%; bottom:calc(var(--bottombar-h) + 14px); transform:translate(-50%,8px);
   background:var(--fundo-card); border:1px solid var(--borda); border-left:4px solid var(--primaria);
-  padding:10px 16px; border-radius:10px; font-size:13.5px; max-width:90%;
-  box-shadow:0 6px 18px rgba(0,0,0,.5); z-index:200; opacity:0;
+  padding:11px 16px; border-radius:12px; font-size:13.5px; max-width:90%;
+  box-shadow:0 8px 24px rgba(0,0,0,.45); z-index:200; opacity:0;
   transition:.25s; pointer-events:none;
 }
 .toast.mostrar{ opacity:1; transform:translate(-50%,0); }
@@ -200,51 +252,58 @@ hr{ border:none; border-top:1px solid var(--borda); margin:16px 0; }
 .linha-form-dupla > div.estreita{ flex:0 0 68px; }
 
 #btnConfigTopo{
-  background:none; border:none; color:var(--texto); font-size:20px;
+  background:none; border:none; color:var(--texto);
   width:40px; height:40px; border-radius:20px; display:flex; align-items:center; justify-content:center;
-  flex-shrink:0;
+  flex-shrink:0; padding:0;
 }
 #btnConfigTopo:active{ background:var(--fundo-card-hover); }
+#btnConfigTopo svg{ width:20px; height:20px; }
 
 .oculto{ display:none !important; }
 .modal-overlay{
-  position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:500;
+  position:fixed; inset:0; background:rgba(2,6,23,.72); z-index:500;
   display:flex; align-items:center; justify-content:center; padding:20px;
+  backdrop-filter:blur(4px);
 }
 .modal-caixa{
-  background:var(--fundo-card); border:1px solid var(--borda); border-radius:14px;
-  padding:20px; max-width:420px; width:100%; max-height:85vh; overflow-y:auto;
+  background:var(--fundo-card); border:1px solid var(--borda); border-radius:16px;
+  padding:22px; max-width:420px; width:100%; max-height:85vh; overflow-y:auto;
+  box-shadow:0 20px 40px rgba(0,0,0,.4);
 }
-.modal-caixa h2{ margin:0 0 4px 0; font-size:17px; }
+.modal-caixa h2{ margin:0 0 6px 0; font-size:17px; font-weight:700; color:var(--texto); }
 .modal-caixa .legenda{ margin-bottom:10px; }
 .modal-caixa .linha-btns{ margin-top:10px; }
 .modal-caixa .btn{ margin-top:8px; }
 .modal-caixa .btn:first-of-type{ margin-top:14px; }
+
+.icon{ display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+.icon svg{ width:1em; height:1em; }
 </style>
+
 </head>
 <body>
 
 <div id="app">
   <div id="topbar">
-    <button id="btnVoltarTopo" onclick="voltar()">←</button>
+    <button id="btnVoltarTopo" onclick="voltar()" aria-label="Voltar"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></button>
     <div id="tituloTopo">Equipeças Rotas</div>
-    <button id="btnConfigTopo" onclick="abrirModalSenha()" title="Configurações">⚙️</button>
+    <button id="btnConfigTopo" onclick="abrirModalSenha()" title="Configurações" aria-label="Configurações"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></button>
   </div>
 
   <div id="paginas">
 
     <!-- ===================== PÁGINA INICIAL ===================== -->
     <div class="pagina" id="pagina-inicio">
-      <h1 class="titulo-pagina">🚚 Equipeças Rotas</h1>
+      <h1 class="titulo-pagina" style="display:flex;align-items:center;gap:10px;"><span class="icon" style="color:var(--primaria);width:28px;height:28px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg></span> Equipeças Rotas</h1>
       <div class="legenda">Gestão de oficinas e expedições. Dados salvos automaticamente neste dispositivo.</div>
       <div class="grid-launcher">
         <button class="card-launcher" onclick="irPara('painel-rotas')">
-          <div class="ic">🧭</div>
+          <div class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg></div>
           <div class="nome">Painel de Rotas</div>
           <div class="desc" id="resumoRotasLauncher">0 rotas abertas</div>
         </button>
         <button class="card-launcher" onclick="irPara('oficinas')">
-          <div class="ic">🏭</div>
+          <div class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M17 18h1"/><path d="M12 18h1"/><path d="M7 18h1"/></svg></div>
           <div class="nome">Oficinas</div>
           <div class="desc" id="resumoOficinasLauncher">0 cadastradas</div>
         </button>
@@ -255,14 +314,14 @@ hr{ border:none; border-top:1px solid var(--borda); margin:16px 0; }
     <div class="pagina" id="pagina-painel-rotas">
       <h1 class="titulo-pagina">Painel de Rotas</h1>
       <div class="legenda" id="legendaLimite"></div>
-      <button class="btn primario" id="btnNovaRota" style="margin-top:14px;" onclick="criarRota()">+ Nova rota</button>
+      <button class="btn primario" id="btnNovaRota" style="margin-top:14px;" onclick="criarRota()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg> Nova rota</button>
       <div id="listaRotas" style="margin-top:16px;"></div>
     </div>
 
     <!-- ===================== DETALHE DA ROTA ===================== -->
     <div class="pagina" id="pagina-rota-detalhe">
       <input id="tituloRotaEdit" value="Rota" onchange="renomearRota(this.value)">
-      <button class="btn perigo pequeno" onclick="excluirRotaAtual()">🗑 Excluir rota</button>
+      <button class="btn perigo pequeno" onclick="excluirRotaAtual()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg> Excluir rota</button>
 
       <div class="subtitulo" id="labelSelecionadas">Oficinas selecionadas (0)</div>
       <div class="lista-caixa" id="listaSelecionadas"></div>
@@ -293,17 +352,17 @@ hr{ border:none; border-top:1px solid var(--borda); margin:16px 0; }
         <option value="2opt">NN + 2-opt</option>
       </select>
 
-      <button class="btn primario" style="margin-top:14px;" onclick="otimizarRotaAtual()">⚡ Otimizar rota</button>
+      <button class="btn primario" style="margin-top:14px;" onclick="otimizarRotaAtual()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg> Otimizar rota</button>
       <div class="legenda" id="statusOtimizacao" style="margin-top:8px;"></div>
 
       <div class="subtitulo">Rota otimizada</div>
       <div class="lista-caixa" id="listaResultado"></div>
 
       <div class="linha-btns" style="margin-top:12px;">
-        <button class="btn sucesso" id="btnCopiarLink" disabled onclick="copiarLinkRota()">📋 Copiar link</button>
-        <button class="btn" id="btnAbrirMaps" disabled onclick="abrirMapsRota()">🌐 Abrir</button>
+        <button class="btn sucesso" id="btnCopiarLink" disabled onclick="copiarLinkRota()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> Copiar link</button>
+        <button class="btn" id="btnAbrirMaps" disabled onclick="abrirMapsRota()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg> Abrir</button>
       </div>
-      <button class="btn primario" id="btnWhatsApp" disabled style="margin-top:8px;" onclick="enviarWhatsApp()">💬 Enviar Rota via WhatsApp</button>
+      <button class="btn primario" id="btnWhatsApp" disabled style="margin-top:8px;" onclick="enviarWhatsApp()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg> Enviar Rota via WhatsApp</button>
     </div>
 
     <!-- ===================== OFICINAS (lista centralizada) ===================== -->
@@ -320,8 +379,8 @@ hr{ border:none; border-top:1px solid var(--borda); margin:16px 0; }
 
       <input type="search" placeholder="Pesquisar por nome, cidade ou endereço..." id="buscaOficinas" oninput="renderListaOficinas(false)" style="margin-top:12px;">
       <div class="linha-btns" style="margin-top:10px;">
-        <button class="btn primario" onclick="novaOficinaForm()">+ Nova oficina</button>
-        <button class="btn pequeno" style="flex:0 0 auto;" onclick="abrirLixeira()">🗑️ Lixeira</button>
+        <button class="btn primario" onclick="novaOficinaForm()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg> Nova oficina</button>
+        <button class="btn pequeno" style="flex:0 0 auto;" onclick="abrirLixeira()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg> Lixeira</button>
       </div>
       <div id="listaOficinas" style="margin-top:12px;"></div>
     </div>
@@ -353,7 +412,7 @@ hr{ border:none; border-top:1px solid var(--borda); margin:16px 0; }
       <label class="rotulo">Link do Google Maps</label>
       <input type="text" id="ofMapsLink" placeholder="Colar link do Google Maps..." oninput="aoColarLinkOficina(this.value)">
 
-      <button class="btn sucesso" id="btnGpsOficina" style="margin-top:12px;" onclick="capturarLocalizacaoGPS()">📍 Usar minha localização atual (GPS)</button>
+      <button class="btn sucesso" id="btnGpsOficina" style="margin-top:12px;" onclick="capturarLocalizacaoGPS()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Usar minha localização atual (GPS)</button>
       <div class="legenda" id="ofGpsStatus" style="margin-top:6px;"></div>
 
       <label class="rotulo">ou buscar coordenadas por endereço (simulado)</label>
@@ -368,8 +427,8 @@ hr{ border:none; border-top:1px solid var(--borda); margin:16px 0; }
         <div class="foto-preview" id="ofFotoPreview">Nenhuma<br>foto</div>
         <div style="display:flex; flex-direction:column; gap:8px; flex:1;">
           <input type="file" id="ofFotoInput" accept="image/*" style="display:none" onchange="aoEscolherFotoOficina(event)">
-          <button class="btn pequeno" onclick="document.getElementById('ofFotoInput').click()">📷 Selecionar foto</button>
-          <button class="btn pequeno" id="btnVerFoto" onclick="verFotoOficina()" disabled>🔍 Ver foto</button>
+          <button class="btn pequeno" onclick="document.getElementById('ofFotoInput').click()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg> Selecionar foto</button>
+          <button class="btn pequeno" id="btnVerFoto" onclick="verFotoOficina()" disabled><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> Ver foto</button>
         </div>
       </div>
 
@@ -390,9 +449,9 @@ hr{ border:none; border-top:1px solid var(--borda); margin:16px 0; }
   </div>
 
   <div id="bottombar">
-    <button class="tab-btn ativo" data-raiz="inicio" onclick="irPara('inicio')"><span class="ic">🏠</span>Início</button>
-    <button class="tab-btn" data-raiz="painel-rotas" onclick="irPara('painel-rotas')"><span class="ic">🧭</span>Rotas</button>
-    <button class="tab-btn" data-raiz="oficinas" onclick="irPara('oficinas')"><span class="ic">🏭</span>Oficinas</button>
+    <button class="tab-btn ativo" data-raiz="inicio" onclick="irPara('inicio')"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>Início</button>
+    <button class="tab-btn" data-raiz="painel-rotas" onclick="irPara('painel-rotas')"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg></span>Rotas</button>
+    <button class="tab-btn" data-raiz="oficinas" onclick="irPara('oficinas')"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M17 18h1"/><path d="M12 18h1"/><path d="M7 18h1"/></svg></span>Oficinas</button>
   </div>
 </div>
 
@@ -401,7 +460,7 @@ hr{ border:none; border-top:1px solid var(--borda); margin:16px 0; }
 <!-- ===================== MODAL: SENHA ADMIN ===================== -->
 <div class="modal-overlay oculto" id="modalSenha">
   <div class="modal-caixa">
-    <h2>🔒 Acesso restrito</h2>
+    <h2 style="display:flex;align-items:center;gap:8px;"><span class="icon" style="width:20px;height:20px;color:var(--primaria);"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span> Acesso restrito</h2>
     <div class="legenda">Digite a senha de administrador para continuar.</div>
     <input type="text" inputmode="numeric" id="inputSenhaAdmin" placeholder="Senha" autocomplete="off"
       onkeydown="if(event.key==='Enter') validarSenhaAdmin();">
@@ -415,16 +474,16 @@ hr{ border:none; border-top:1px solid var(--borda); margin:16px 0; }
 <!-- ===================== MODAL: PAINEL ADMIN ===================== -->
 <div class="modal-overlay oculto" id="modalAdmin">
   <div class="modal-caixa">
-    <h2>⚙️ Painel de Configurações</h2>
+    <h2 style="display:flex;align-items:center;gap:8px;"><span class="icon" style="width:20px;height:20px;color:var(--primaria);"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span> Painel de Configurações</h2>
     <div class="legenda">Gerencie o backup local e o backup oficial na nuvem.</div>
 
-    <button class="btn" onclick="acionarSelecaoArquivoBackup()">📂 Restaurar Backup Local (Carregar Arquivo)</button>
+    <button class="btn" onclick="acionarSelecaoArquivoBackup()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9l-.81-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg> Restaurar Backup Local (Carregar Arquivo)</button>
     <div class="legenda">Carrega oficinas de um arquivo .json/.txt salvo no dispositivo.</div>
 
-    <button class="btn sucesso" onclick="gerarPublicarBackupOficial()">☁️ Gerar e Publicar Backup Oficial</button>
+    <button class="btn sucesso" onclick="gerarPublicarBackupOficial()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg> Gerar e Publicar Backup Oficial</button>
     <div class="legenda">Envia a lista atual para a nuvem (JSONBin) e baixa um arquivo backup_oficinas.json.</div>
 
-    <button class="btn" onclick="testarConexaoNuvem()">🔎 Testar conexão com a nuvem</button>
+    <button class="btn" onclick="testarConexaoNuvem()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> Testar conexão com a nuvem</button>
     <div class="legenda">Verifica se a chave e o Bin da JSONBin estão respondendo corretamente.</div>
 
     <input type="file" id="inputArquivoBackup" accept=".json,.txt,application/json,text/plain" style="display:none" onchange="aoSelecionarArquivoBackup(event)">
@@ -436,14 +495,14 @@ hr{ border:none; border-top:1px solid var(--borda); margin:16px 0; }
 <!-- ===================== MODAL: OPÇÕES DE RESTAURAÇÃO ===================== -->
 <div class="modal-overlay oculto" id="modalRestaurarOpcoes">
   <div class="modal-caixa">
-    <h2>📂 Restaurar Backup</h2>
+    <h2 style="display:flex;align-items:center;gap:8px;"><span class="icon" style="width:20px;height:20px;color:var(--primaria);"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9l-.81-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg></span> Restaurar Backup</h2>
     <div class="legenda" id="labelQtdArquivoRestaurar"></div>
     <div class="legenda">Como deseja aplicar os dados do arquivo?</div>
 
-    <button class="btn perigo" onclick="restaurarSubstituirTudo()">♻️ Substituir Tudo</button>
+    <button class="btn perigo" onclick="restaurarSubstituirTudo()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg> Substituir Tudo</button>
     <div class="legenda">Apaga a lista atual e carrega 100% dos dados do arquivo.</div>
 
-    <button class="btn sucesso" onclick="restaurarMesclarNovos()">➕ Mesclar Novos</button>
+    <button class="btn sucesso" onclick="restaurarMesclarNovos()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg> Mesclar Novos</button>
     <div class="legenda">Adiciona apenas as oficinas do arquivo que ainda não existem no sistema.</div>
 
     <button class="btn" style="margin-top:16px;" onclick="fecharModalRestaurarOpcoes()">Cancelar</button>
@@ -453,7 +512,7 @@ hr{ border:none; border-top:1px solid var(--borda); margin:16px 0; }
 <!-- ===================== MODAL: LIXEIRA DE OFICINAS ===================== -->
 <div class="modal-overlay oculto" id="modalLixeira">
   <div class="modal-caixa">
-    <h2>🗑️ Lixeira de oficinas</h2>
+    <h2 style="display:flex;align-items:center;gap:8px;"><span class="icon" style="width:20px;height:20px;color:var(--primaria);"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></span> Lixeira de oficinas</h2>
     <div class="legenda">Oficinas excluídas podem ser restauradas para o cadastro ativo.</div>
 
     <label class="item-lista" style="border:1px solid var(--borda); border-radius:8px; margin-top:8px;">
@@ -464,7 +523,7 @@ hr{ border:none; border-top:1px solid var(--borda); margin:16px 0; }
     <div class="lista-caixa" id="listaLixeira" style="margin-top:10px; max-height:320px; overflow-y:auto;"></div>
 
     <div class="linha-btns">
-      <button class="btn sucesso" id="btnRestaurarSelecionadas" onclick="restaurarSelecionadasLixeira()">↩ Restaurar Selecionadas</button>
+      <button class="btn sucesso" id="btnRestaurarSelecionadas" onclick="restaurarSelecionadasLixeira()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg> Restaurar Selecionadas</button>
       <button class="btn" onclick="fecharLixeira()">Fechar</button>
     </div>
   </div>
@@ -715,6 +774,16 @@ function distanciaTotal(pontos, ordem){
   for(let i=0;i<ordem.length-1;i++) d += haversine(pontos[ordem[i]], pontos[ordem[i+1]]);
   return d;
 }
+/** Custo do caminho aberto (Haversine): origem → 1ª parada → … → última. */
+function custoCaminho(pontos, ordem, origem){
+  let d = 0;
+  if(origem && coordsValidas(origem.lat, origem.lon != null ? origem.lon : origem.lng)){
+    const olng = origem.lon != null ? origem.lon : origem.lng;
+    d += haversine({lat:+origem.lat, lng:+olng}, pontos[ordem[0]]);
+  }
+  for(let i=0;i<ordem.length-1;i++) d += haversine(pontos[ordem[i]], pontos[ordem[i+1]]);
+  return d;
+}
 function nnDe(pontos, inicio){
   const visitados = new Set([inicio]);
   const ordem = [inicio];
@@ -727,6 +796,7 @@ function nnDe(pontos, inicio){
         if(d<menorDist){ menorDist=d; maisPerto=i; }
       }
     }
+    if(maisPerto < 0) break;
     visitados.add(maisPerto); ordem.push(maisPerto);
   }
   return ordem;
@@ -740,9 +810,21 @@ function nnMelhor(pontos){
   }
   return melhor;
 }
-function twoOpt(pontos, ordemInicial){
+function nnMelhorComOrigem(pontos, origem){
+  let melhor=null, melhorD=Infinity;
+  for(let s=0;s<pontos.length;s++){
+    const ordem = nnDe(pontos,s);
+    const d = custoCaminho(pontos, ordem, origem);
+    if(d<melhorD){ melhorD=d; melhor=ordem; }
+  }
+  return melhor;
+}
+function twoOpt(pontos, ordemInicial, origem){
   let melhor = ordemInicial.slice();
   let melhorou = true;
+  const custo = (ord) => origem
+    ? custoCaminho(pontos, ord, origem)
+    : distanciaTotal(pontos, ord);
   while(melhorou){
     melhorou=false;
     for(let i=0;i<melhor.length-1;i++){
@@ -750,7 +832,7 @@ function twoOpt(pontos, ordemInicial){
         const novo = melhor.slice(0,i+1)
           .concat(melhor.slice(i+1,j+1).reverse())
           .concat(melhor.slice(j+1));
-        if(distanciaTotal(pontos,novo) < distanciaTotal(pontos,melhor)){
+        if(custo(novo) + 1e-9 < custo(melhor)){
           melhor=novo; melhorou=true;
         }
       }
@@ -758,13 +840,208 @@ function twoOpt(pontos, ordemInicial){
   }
   return melhor;
 }
-function otimizar(pontos, algoritmo){
-  if(pontos.length<=1) return {ordem:pontos.map((_,i)=>i), nome:'Único destino'};
-  if(algoritmo==='nn') return {ordem:nnMelhor(pontos), nome:'Nearest Neighbor'};
-  const base = nnMelhor(pontos);
-  const otim = twoOpt(pontos, base);
-  return {ordem:otim, nome:'NN + 2-opt'};
+function otimizarHaversine(pontos, algoritmo, origem){
+  if(pontos.length<=1) return {ordem:pontos.map((_,i)=>i), nome:'Único destino', fonte:'haversine'};
+  const temOrigem = !!(origem && coordsValidas(origem.lat, origem.lon != null ? origem.lon : origem.lng));
+  const modo = algoritmo === 'auto' ? '2opt' : algoritmo;
+  if(modo === 'nn'){
+    if(temOrigem){
+      return {ordem: nnMelhorComOrigem(pontos, origem), nome:'Nearest Neighbor (origem fixa)', fonte:'haversine'};
+    }
+    return {ordem: nnMelhor(pontos), nome:'Nearest Neighbor', fonte:'haversine'};
+  }
+  const base = temOrigem ? nnMelhorComOrigem(pontos, origem) : nnMelhor(pontos);
+  const otim = twoOpt(pontos, base, temOrigem ? origem : null);
+  return {
+    ordem: otim,
+    nome: temOrigem ? 'NN + 2-opt (origem fixa)' : 'NN + 2-opt',
+    fonte:'haversine'
+  };
 }
+
+/* ========== OSRM: distâncias reais por via (OpenStreetMap, gratuito) ========== */
+const OSRM_TABLE_URL = 'https://router.project-osrm.org/table/v1/driving/';
+
+/**
+ * Matriz de distâncias (km) entre coordenadas via OSRM público.
+ * coords: [{lat, lng}, ...] — na URL o OSRM exige lon,lat.
+ */
+async function obterMatrizOsrm(coords){
+  if(!coords || coords.length < 2) throw new Error('OSRM: poucos pontos');
+  if(coords.length > 80) throw new Error('OSRM: limite de pontos excedido');
+  const path = coords.map(c => `${(+c.lng).toFixed(6)},${(+c.lat).toFixed(6)}`).join(';');
+  const url = `${OSRM_TABLE_URL}${path}?annotations=distance`;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 12000);
+  try{
+    const res = await fetch(url, { signal: controller.signal });
+    if(!res.ok) throw new Error('OSRM HTTP ' + res.status);
+    const data = await res.json();
+    if(!data || data.code !== 'Ok' || !Array.isArray(data.distances)){
+      throw new Error('OSRM resposta inválida');
+    }
+    return data.distances.map(row =>
+      row.map(m => (m == null || !Number.isFinite(m)) ? Infinity : m / 1000)
+    );
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function custoCaminhoMatriz(matriz, ordemCompleta){
+  let d = 0;
+  for(let i=0;i<ordemCompleta.length-1;i++){
+    const trecho = matriz[ordemCompleta[i]][ordemCompleta[i+1]];
+    if(!Number.isFinite(trecho)) return Infinity;
+    d += trecho;
+  }
+  return d;
+}
+
+function nnDeMatriz(matriz, startIdx, n){
+  const visitados = new Set([startIdx]);
+  const ordem = [startIdx];
+  while(ordem.length < n){
+    const ultimo = ordem[ordem.length-1];
+    let maisPerto=-1, menorDist=Infinity;
+    for(let i=0;i<n;i++){
+      if(!visitados.has(i)){
+        const d = matriz[ultimo][i];
+        if(d < menorDist){ menorDist=d; maisPerto=i; }
+      }
+    }
+    if(maisPerto < 0) break;
+    visitados.add(maisPerto); ordem.push(maisPerto);
+  }
+  return ordem;
+}
+
+/** NN na matriz. fixedStart>=0: caminho sempre inicia nesse índice (origem). */
+function nnMelhorMatriz(matriz, fixedStart){
+  const n = matriz.length;
+  let melhor=null, melhorD=Infinity;
+  if(fixedStart >= 0){
+    for(let s=0;s<n;s++){
+      if(s === fixedStart) continue;
+      const visitados = new Set([fixedStart, s]);
+      const ordem = [fixedStart, s];
+      while(ordem.length < n){
+        const ultimo = ordem[ordem.length-1];
+        let maisPerto=-1, menorDist=Infinity;
+        for(let i=0;i<n;i++){
+          if(!visitados.has(i)){
+            const d = matriz[ultimo][i];
+            if(d < menorDist){ menorDist=d; maisPerto=i; }
+          }
+        }
+        if(maisPerto < 0) break;
+        visitados.add(maisPerto); ordem.push(maisPerto);
+      }
+      const d = custoCaminhoMatriz(matriz, ordem);
+      if(d < melhorD){ melhorD=d; melhor=ordem; }
+    }
+    if(!melhor) melhor = nnDeMatriz(matriz, fixedStart, n);
+    return melhor;
+  }
+  for(let s=0;s<n;s++){
+    const ordem = nnDeMatriz(matriz, s, n);
+    const d = custoCaminhoMatriz(matriz, ordem);
+    if(d < melhorD){ melhorD=d; melhor=ordem; }
+  }
+  return melhor;
+}
+
+/** 2-opt em caminho aberto; fixedStart>=0 mantém o primeiro nó fixo. */
+function twoOptMatriz(matriz, ordemInicial, fixedStart){
+  let melhor = ordemInicial.slice();
+  let melhorou = true;
+  while(melhorou){
+    melhorou=false;
+    for(let i=0;i<melhor.length-1;i++){
+      for(let j=i+2;j<melhor.length;j++){
+        let novo;
+        if(fixedStart >= 0 && i === 0){
+          novo = [melhor[0]]
+            .concat(melhor.slice(1, j+1).reverse())
+            .concat(melhor.slice(j+1));
+        } else {
+          novo = melhor.slice(0,i+1)
+            .concat(melhor.slice(i+1,j+1).reverse())
+            .concat(melhor.slice(j+1));
+          if(fixedStart >= 0 && novo[0] !== melhor[0]) continue;
+        }
+        if(custoCaminhoMatriz(matriz, novo) + 1e-9 < custoCaminhoMatriz(matriz, melhor)){
+          melhor=novo; melhorou=true;
+        }
+      }
+    }
+  }
+  return melhor;
+}
+
+function otimizarComMatriz(matriz, pontos, algoritmo, temOrigem){
+  const modo = algoritmo === 'auto' ? '2opt' : algoritmo;
+  const fixedStart = temOrigem ? 0 : -1;
+  let caminho;
+  if(modo === 'nn'){
+    caminho = nnMelhorMatriz(matriz, fixedStart);
+  } else {
+    const base = nnMelhorMatriz(matriz, fixedStart);
+    caminho = twoOptMatriz(matriz, base, fixedStart);
+  }
+  let ordemOficinas;
+  if(temOrigem){
+    ordemOficinas = caminho.filter(i => i !== 0).map(i => i - 1);
+  } else {
+    ordemOficinas = caminho.slice();
+  }
+  const distKm = custoCaminhoMatriz(matriz, caminho);
+  const nomeBase = modo === 'nn' ? 'Nearest Neighbor' : 'NN + 2-opt';
+  return {
+    ordem: ordemOficinas,
+    nome: nomeBase + ' (vias reais)',
+    fonte: 'osrm',
+    distKm: Number.isFinite(distKm) ? distKm : null
+  };
+}
+
+/**
+ * Otimização principal: tenta OSRM (distância por vias); fallback Haversine.
+ * @returns {Promise<{ordem, nome, fonte, distKm?}>}
+ */
+async function otimizar(pontos, algoritmo, origem){
+  if(pontos.length <= 1){
+    return {ordem: pontos.map((_,i)=>i), nome:'Único destino', fonte:'haversine'};
+  }
+  const temOrigem = !!(origem && coordsValidas(origem.lat, origem.lon != null ? origem.lon : origem.lng));
+
+  const coords = [];
+  if(temOrigem){
+    coords.push({
+      lat: +origem.lat,
+      lng: +(origem.lon != null ? origem.lon : origem.lng)
+    });
+  }
+  pontos.forEach(p => coords.push({ lat:+p.lat, lng:+p.lng }));
+
+  try{
+    const matriz = await obterMatrizOsrm(coords);
+    const result = otimizarComMatriz(matriz, pontos, algoritmo, temOrigem);
+    if(!result.ordem || result.ordem.length !== pontos.length){
+      throw new Error('OSRM ordem incompleta');
+    }
+    if(result.distKm == null || !Number.isFinite(result.distKm)){
+      throw new Error('OSRM sem rotas viáveis');
+    }
+    return result;
+  }catch(err){
+    console.warn('OSRM indisponível, usando Haversine:', err && err.message ? err.message : err);
+    const fb = otimizarHaversine(pontos, algoritmo, origem);
+    fb.nome = fb.nome + ' (linha reta)';
+    return fb;
+  }
+}
+
 function geocodeSimulado(texto){
   let hash=0;
   for(let i=0;i<texto.length;i++){ hash = (hash*31 + texto.charCodeAt(i)) % 100000; }
@@ -1023,15 +1300,15 @@ function atualizarLabelOrigem(){
   const el = document.getElementById('labelOrigemRota');
   const modo = document.getElementById('selOrigem').value;
   if(modo === 'sede'){
-    el.textContent = `📍 Sede Equipeças (${SEDE_EQUIPECAS.lat.toFixed(5)}, ${SEDE_EQUIPECAS.lon.toFixed(5)})`;
+    el.textContent = `Sede Equipeças (${SEDE_EQUIPECAS.lat.toFixed(5)}, ${SEDE_EQUIPECAS.lon.toFixed(5)})`;
   } else if(modo === 'gps'){
     if(gpsOrigem.lat != null){
-      el.textContent = `📍 GPS atual: ${gpsOrigem.lat.toFixed(5)}, ${gpsOrigem.lon.toFixed(5)}`;
+      el.textContent = `GPS atual: ${gpsOrigem.lat.toFixed(5)}, ${gpsOrigem.lon.toFixed(5)}`;
     } else {
-      el.textContent = '📍 Localização atual (GPS) — será solicitada ao otimizar.';
+      el.textContent = 'Localização atual (GPS) — será solicitada ao otimizar.';
     }
   } else {
-    el.textContent = '📍 A rota partirá da primeira oficina da lista otimizada.';
+    el.textContent = 'A rota partirá da primeira oficina da lista otimizada.';
   }
 }
 
@@ -1064,7 +1341,7 @@ function renderListaSelecionadas(){
     const linha = document.createElement('div');
     linha.className='item-lista';
     linha.innerHTML = `<span class="txt">${escapeHtml(of.nome)}${of.cidade? ' — '+escapeHtml(of.cidade):''}</span>
-      <button class="chip-remover" title="Remover desta rota" onclick="removerDaRota(${of.id}, '${escapeAttr(of.nome)}')">×</button>`;
+      <button class="chip-remover" title="Remover desta rota" onclick="removerDaRota(${of.id}, '${escapeAttr(of.nome)}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>`;
     box.appendChild(linha);
   });
 }
@@ -1101,7 +1378,7 @@ function renderListaTodasRota(){
     linha.className='item-lista';
     linha.innerHTML = `<input type="checkbox" ${marcado?'checked':''} onclick="event.stopPropagation(); alternarSelecao(${of.id})">
       <span class="txt">${escapeHtml(of.nome)}${of.cidade? '  ·  '+escapeHtml(of.cidade):''}</span>
-      ${of.fotoDataUrl? '<span class="badge foto">📷</span>':''}
+      ${of.fotoDataUrl? '<span class="badge foto">Foto</span>':''}
       ${of.verificada? '<span class="badge verificada">✓</span>':''}`;
     linha.onclick = ()=>alternarSelecao(of.id);
     box.appendChild(linha);
@@ -1133,7 +1410,7 @@ function capturarGPSParaOrigem(){
       resolve(false);
       return;
     }
-    document.getElementById('labelOrigemRota').textContent = '⏳ Obtendo localização GPS...';
+    document.getElementById('labelOrigemRota').textContent = 'Obtendo localização GPS...';
     navigator.geolocation.getCurrentPosition(
       (pos)=>{
         gpsOrigem = {
@@ -1173,36 +1450,42 @@ async function otimizarRotaAtual(){
   if(modoOrigem === 'gps' && gpsOrigem.lat == null){
     const ok = await capturarGPSParaOrigem();
     if(!ok){
-      document.getElementById('statusOtimizacao').textContent = '⚠ Não foi possível obter GPS. Escolha outra origem ou tente novamente.';
+      document.getElementById('statusOtimizacao').textContent = 'Não foi possível obter GPS. Escolha outra origem ou tente novamente.';
       return;
     }
   }
 
-  document.getElementById('statusOtimizacao').textContent='⏳ Calculando rota otimizada...';
+  document.getElementById('statusOtimizacao').textContent='Calculando rota otimizada (vias reais)...';
+  document.getElementById('btnCopiarLink').disabled=true;
+  document.getElementById('btnAbrirMaps').disabled=true;
+  document.getElementById('btnWhatsApp').disabled=true;
 
-  setTimeout(()=>{
-    const pontos = selecionadas.map(o=>({lat:o.lat, lng:o.lng, id:o.id, label:o.nome}));
-    const algoritmo = document.getElementById('selAlgoritmo').value;
-    const transporte = document.getElementById('selTransporte').value;
-    const {ordem, nome} = otimizar(pontos, algoritmo==='auto' ? '2opt' : algoritmo);
+  const pontos = selecionadas.map(o=>({lat:o.lat, lng:o.lng, id:o.id, label:o.nome}));
+  const algoritmo = document.getElementById('selAlgoritmo').value;
+  const transporte = document.getElementById('selTransporte').value;
+  const origemCalc = resolverOrigemCalculo();
 
-    const origemCalc = resolverOrigemCalculo();
-    let dist = distanciaTotal(pontos, ordem);
-    if(origemCalc && origemCalc.lat != null){
-      dist += haversine({lat:origemCalc.lat, lng:origemCalc.lon}, pontos[ordem[0]]);
-    }
+  try{
+    // OSRM (vias) com fallback automático para Haversine (linha reta)
+    const resultado = await otimizar(pontos, algoritmo==='auto' ? '2opt' : algoritmo, origemCalc);
+    const {ordem, nome, fonte} = resultado;
+    const dist = (resultado.distKm != null && Number.isFinite(resultado.distKm))
+      ? resultado.distKm
+      : custoCaminho(pontos, ordem, origemCalc);
 
     const pontosOrdenados = ordem.map(i=>pontos[i]);
     const urlPreview = gerarLinkRota(pontosOrdenados, origemCalc, transporte, 'preview');
     const urlWhatsApp = gerarLinkRota(pontosOrdenados, null, transporte, 'whatsapp');
 
-    document.getElementById('statusOtimizacao').textContent = `✓ ${nome} — ${dist.toFixed(1)} km total`;
+    const sufixoFonte = fonte === 'osrm' ? '' : '';
+    document.getElementById('statusOtimizacao').textContent =
+      `${nome} — ${dist.toFixed(1)} km total`;
     const lista = document.getElementById('listaResultado');
     lista.innerHTML='';
     if(origemCalc && origemCalc.lat != null){
       const l = document.createElement('div');
       l.className='item-lista';
-      l.innerHTML = `<span class="txt">🟢 Origem: ${escapeHtml(origemCalc.label || origemCalc.lat.toFixed(5)+', '+origemCalc.lon.toFixed(5))}</span>`;
+      l.innerHTML = `<span class="txt">Origem: ${escapeHtml(origemCalc.label || origemCalc.lat.toFixed(5)+', '+origemCalc.lon.toFixed(5))}</span>`;
       lista.appendChild(l);
     }
     ordem.forEach((idx,passo)=>{
@@ -1219,7 +1502,12 @@ async function otimizarRotaAtual(){
     document.getElementById('btnAbrirMaps').disabled=false;
     document.getElementById('btnWhatsApp').disabled=false;
     salvarEstado();
-  }, 300);
+  }catch(err){
+    console.error('Erro ao otimizar rota:', err);
+    document.getElementById('statusOtimizacao').textContent =
+      'Falha ao otimizar. Verifique a conexão e tente novamente.';
+    mostrarToast('Não foi possível otimizar a rota.','erro');
+  }
 }
 
 function copiarLinkRota(){
@@ -1227,7 +1515,7 @@ function copiarLinkRota(){
   const url = (rota && (rota._mapsUrlWhatsApp || rota._mapsUrlAtual));
   if(!url) return;
   navigator.clipboard?.writeText(url).then(()=>{
-    document.getElementById('statusOtimizacao').textContent = '✓ Link copiado! Cole no WhatsApp do motorista.';
+    document.getElementById('statusOtimizacao').textContent = 'Link copiado! Cole no WhatsApp do motorista.';
     mostrarToast('Link copiado.','sucesso');
   }).catch(()=>{
     prompt('Copie o link manualmente:', url);
@@ -1253,12 +1541,12 @@ function atualizarLabelOrigemLista(){
   const modo = document.getElementById('selOrigemLista').value;
   if(modo === 'gps'){
     if(gpsOrigem.lat != null){
-      el.textContent = `📍 GPS: ${gpsOrigem.lat.toFixed(5)}, ${gpsOrigem.lon.toFixed(5)}`;
+      el.textContent = `GPS: ${gpsOrigem.lat.toFixed(5)}, ${gpsOrigem.lon.toFixed(5)}`;
     } else {
-      el.textContent = '📍 GPS ainda não capturado — toque para solicitar.';
+      el.textContent = 'GPS ainda não capturado — toque para solicitar.';
     }
   } else {
-    el.textContent = `📍 Sede Equipeças (${SEDE_EQUIPECAS.lat.toFixed(5)}, ${SEDE_EQUIPECAS.lon.toFixed(5)})`;
+    el.textContent = `Sede Equipeças (${SEDE_EQUIPECAS.lat.toFixed(5)}, ${SEDE_EQUIPECAS.lon.toFixed(5)})`;
   }
 }
 
@@ -1284,7 +1572,7 @@ function capturarGPSParaOrigemLista(){
       resolve(false);
       return;
     }
-    document.getElementById('labelOrigemLista').textContent = '⏳ Obtendo GPS...';
+    document.getElementById('labelOrigemLista').textContent = 'Obtendo GPS...';
     navigator.geolocation.getCurrentPosition(
       (pos)=>{
         gpsOrigem = {
@@ -1350,8 +1638,8 @@ function renderListaOficinas(reordenar){
         <div class="info">
           <div class="nome">${escapeHtml(of.nome)}
             ${of.verificada? '<span class="badge verificada">✓</span>':''}
-            ${of.fotoDataUrl? '<span class="badge foto">📷</span>':''}
-            <span class="seta">▾</span>
+            ${of.fotoDataUrl? '<span class="badge foto">Foto</span>':''}
+            <span class="seta"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
           </div>
           <div class="meta">${of.cidade? escapeHtml(of.cidade)+(of.estado? ' — '+escapeHtml(of.estado):'') : (of.endereco? escapeHtml(of.endereco):'Sem cidade')}</div>
         </div>
@@ -1359,8 +1647,8 @@ function renderListaOficinas(reordenar){
       </div>
       <div class="detalhes">
         <div class="acoes">
-          <button class="btn pequeno" onclick="event.stopPropagation(); editarOficina(${of.id})">✏️ Editar</button>
-          <button class="btn perigo pequeno" onclick="event.stopPropagation(); excluirOficinaDireto(${of.id}, '${escapeAttr(of.nome)}')">🗑️ Excluir</button>
+          <button class="btn pequeno" onclick="event.stopPropagation(); editarOficina(${of.id})"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg> Editar</button>
+          <button class="btn perigo pequeno" onclick="event.stopPropagation(); excluirOficinaDireto(${of.id}, '${escapeAttr(of.nome)}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg> Excluir</button>
         </div>
       </div>`;
     box.appendChild(card);
@@ -1439,7 +1727,7 @@ function preencherFormOficina(id){
 function atualizarLabelCoordsOficina(){
   const el = document.getElementById('ofCoordsLabel');
   if(window._ofLat!=null && window._ofLon!=null){
-    el.textContent = `📍 ${(+window._ofLat).toFixed(6)}, ${(+window._ofLon).toFixed(6)}`;
+    el.textContent = `${(+window._ofLat).toFixed(6)}, ${(+window._ofLon).toFixed(6)}`;
   } else {
     el.textContent = 'Sem coordenadas definidas';
   }
@@ -1456,7 +1744,7 @@ function buscarGeocodingOficina(){
     const {lat,lon} = geocodeSimulado(endereco);
     window._ofLat=lat; window._ofLon=lon;
     atualizarLabelCoordsOficina();
-    document.getElementById('ofFeedback').textContent = `✓ Localização simulada para "${endereco}"`;
+    document.getElementById('ofFeedback').textContent = `Localização simulada para "${endereco}"`;
   }, 250);
 }
 
@@ -1475,14 +1763,14 @@ function capturarLocalizacaoGPS(){
     return;
   }
 
-  statusEl.textContent = '⏳ Obtendo localização atual via GPS...';
+  statusEl.textContent = 'Obtendo localização atual via GPS...';
   navigator.geolocation.getCurrentPosition(
     (pos)=>{
       window._ofLat = pos.coords.latitude;
       window._ofLon = pos.coords.longitude;
       atualizarLabelCoordsOficina();
       const precisao = pos.coords.accuracy!=null ? ` (precisão de ${Math.round(pos.coords.accuracy)} m)` : '';
-      statusEl.textContent = `✓ Localização GPS capturada com sucesso${precisao}.`;
+      statusEl.textContent = `Localização GPS capturada com sucesso${precisao}.`;
       mostrarToast('Posição via GPS capturada.','sucesso');
     },
     (erro)=>{
@@ -1509,7 +1797,7 @@ function aoEscolherFotoOficina(ev){
     fotoFormPendente = leitor.result;
     document.getElementById('ofFotoPreview').innerHTML = `<img src="${fotoFormPendente}">`;
     document.getElementById('btnVerFoto').disabled=false;
-    document.getElementById('ofFeedback').textContent='✓ Foto pronta — toque em Salvar para confirmar.';
+    document.getElementById('ofFeedback').textContent='Foto pronta — toque em Salvar para confirmar.';
   };
   leitor.readAsDataURL(arquivo);
 }
@@ -1544,7 +1832,7 @@ function salvarOficina(){
     oficinas.push({id:oficinaFormAtualId, fotoDataUrl:null, deletada:false, ...dados});
   }
   fotoFormPendente = null;
-  document.getElementById('ofFeedback').textContent='✓ Oficina salva.';
+  document.getElementById('ofFeedback').textContent='Oficina salva.';
   salvarEstado();
   recalcularOrdemPorDistancia();
   mostrarToast('Oficina salva com sucesso.','sucesso');
@@ -1707,7 +1995,7 @@ function testarConexaoNuvem(){
     alert('⚠ A nuvem ainda não foi configurada (NUVEM_API_KEY / NUVEM_BIN_ID vazios ou com valor padrão).');
     return;
   }
-  mostrarToast('⏳ Testando conexão com a nuvem...', '');
+  mostrarToast('Testando conexão com a nuvem...', '');
   fetch(`https://api.jsonbin.io/v3/b/${NUVEM_BIN_ID}/latest`, {
     method: 'GET',
     headers: { 'X-Master-Key': NUVEM_API_KEY }
@@ -1766,7 +2054,7 @@ function gerarPublicarBackupOficial(){
     })
     .then(()=>{
       console.log('Backup oficial publicado na nuvem.');
-      mostrarToast('☁️ Backup publicado na nuvem com sucesso.','sucesso');
+      mostrarToast('Backup publicado na nuvem com sucesso.','sucesso');
     })
     .catch(err=>{
       console.error('Erro ao publicar backup oficial na nuvem:', err);
@@ -1824,7 +2112,7 @@ function renderListaLixeira(){
     linha.innerHTML = `
       <input type="checkbox" class="chk-lixeira" data-id="${of.id}">
       <span class="txt">${escapeHtml(of.nome)}${of.cidade? ' — '+escapeHtml(of.cidade):''}</span>
-      <button class="btn pequeno" style="flex-shrink:0; width:auto;" onclick="restaurarOficina(${of.id})">↩ Restaurar</button>`;
+      <button class="btn pequeno" style="flex-shrink:0; width:auto;" onclick="restaurarOficina(${of.id})"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg> Restaurar</button>`;
     box.appendChild(linha);
   });
 }
