@@ -657,22 +657,36 @@ function semear(){
   });
 }
 
-if(!carregarEstado()){
-  semear();
-  salvarEstado();
+if(carregarEstado()){
+  // Já existem dados neste dispositivo — mesmo assim, tenta buscar uma versão
+  // mais nova da nuvem em segundo plano (não bloqueia a tela).
+  restaurarDaNuvem().then(atualizou => {
+    if(atualizou){
+      recalcularOrdemPorDistancia();
+      rerenderizarAposSincronizarNuvem();
+    }
+  });
+} else {
+  // Dispositivo novo/sem dados locais: tenta restaurar da nuvem ANTES de usar
+  // dados de exemplo, para não deixar o backup real de fora por causa da
+  // lista de demonstração ter "preenchido" o armazenamento local primeiro.
+  restaurarDaNuvem().then(atualizou => {
+    if(!atualizou){
+      semear();
+    }
+    salvarEstado();
+    recalcularOrdemPorDistancia();
+    rerenderizarAposSincronizarNuvem();
+  });
 }
 
-// Tenta sincronizar com a nuvem em segundo plano (não bloqueia a UI)
-restaurarDaNuvem().then(atualizou => {
-  if(atualizou){
-    recalcularOrdemPorDistancia();
-    if(typeof atualizarLauncher === 'function') atualizarLauncher();
-    const pg = document.querySelector('.pagina.ativa');
-    if(pg && pg.id === 'pagina-oficinas') renderListaOficinas(false);
-    if(pg && pg.id === 'pagina-painel-rotas') renderListaRotas();
-    if(pg && pg.id === 'pagina-inicio') atualizarLauncher();
-  }
-});
+function rerenderizarAposSincronizarNuvem(){
+  if(typeof atualizarLauncher === 'function') atualizarLauncher();
+  const pg = document.querySelector('.pagina.ativa');
+  if(pg && pg.id === 'pagina-oficinas') renderListaOficinas(false);
+  if(pg && pg.id === 'pagina-painel-rotas') renderListaRotas();
+  if(pg && pg.id === 'pagina-inicio') atualizarLauncher();
+}
 
 function mostrarToast(msg, tipo=''){
   const el = document.getElementById('toast');
