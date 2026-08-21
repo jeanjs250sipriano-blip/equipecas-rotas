@@ -424,6 +424,9 @@ hr{ border:none; border-top:1px solid var(--borda); margin:16px 0; }
     <button class="btn sucesso" onclick="gerarPublicarBackupOficial()">☁️ Gerar e Publicar Backup Oficial</button>
     <div class="legenda">Envia a lista atual para a nuvem (JSONBin) e baixa um arquivo backup_oficinas.json.</div>
 
+    <button class="btn" onclick="testarConexaoNuvem()">🔎 Testar conexão com a nuvem</button>
+    <div class="legenda">Verifica se a chave e o Bin da JSONBin estão respondendo corretamente.</div>
+
     <input type="file" id="inputArquivoBackup" accept=".json,.txt,application/json,text/plain" style="display:none" onchange="aoSelecionarArquivoBackup(event)">
 
     <button class="btn" style="margin-top:16px;" onclick="fecharModalAdmin()">Fechar</button>
@@ -540,7 +543,9 @@ function backupAutomaticoNuvem(){
     const payload = {
       proximoIdOficina,
       proximoIdRota,
-      oficinas,
+      // Remove fotos (base64) do envio automático para não estourar o limite
+      // de tamanho do plano gratuito da JSONBin (100KB por Bin).
+      oficinas: oficinas.map(({fotoDataUrl, ...resto})=>resto),
       rotas,
       salvo_em: new Date().toISOString()
     };
@@ -552,12 +557,12 @@ function backupAutomaticoNuvem(){
       },
       body: JSON.stringify(payload)
     })
-    .then(res => {
-      if(!res.ok) throw new Error('HTTP '+res.status);
+    .then(async res => {
+      if(!res.ok) throw new Error(await lerErroJsonBin(res));
       return res.json();
     })
     .then(() => console.log('Backup automático em nuvem concluído!'))
-    .catch(err => console.error('Erro no backup em nuvem:', err));
+    .catch(err => console.error('Erro no backup automático em nuvem:', err.message));
   }, 2000);
 }
 
@@ -1660,6 +1665,57 @@ function finalizarRestauracao(mensagem){
 }
 
 /** Publica a lista mestre no JSONBin (nuvem) e baixa um arquivo local de backup. */
+/** Lê o corpo de erro de uma resposta da JSONBin e monta uma mensagem legível para o usuário. */
+async function lerErroJsonBin(res){
+  let detalhe = 'HTTP ' + res.status;
+  try{
+    const corpo = await res.json();
+    if(corpo && corpo.message) detalhe += ' — ' + corpo.message;
+  }catch(_){ /* corpo não era JSON, mantém só o status */ }
+
+  if(res.status === 401 || res.status === 403){
+    detalhe += ' (chave de API inválida ou sem permissão — confira NUVEM_API_KEY)';
+  } else if(res.status === 404){
+    detalhe += ' (Bin não encontrado — confira NUVEM_BIN_ID)';
+  } else if(res.status === 400){
+    detalhe += ' (dados rejeitados — talvez o backup esteja maior que o limite do plano gratuito, 100KB)';
+  } else if(res.status === 429){
+    detalhe += ' (limite de requisições da JSONBin atingido — aguarde e tente novamente)';
+  }
+  return detalhe;
+}
+
+/** Testa a conexão com a JSONBin (chave + Bin ID) e mostra o resultado direto na tela,
+ *  sem precisar abrir o console do navegador. */
+function testarConexaoNuvem(){
+  if(!NUVEM_API_KEY || NUVEM_API_KEY === 'SUA_CHAVE_API_AQUI' ||
+     !NUVEM_BIN_ID  || NUVEM_BIN_ID  === 'SEU_BIN_ID_AQUI'){
+    alert('⚠ A nuvem ainda não foi configurada (NUVEM_API_KEY / NUVEM_BIN_ID vazios ou com valor padrão).');
+    return;
+  }
+  mostrarToast('⏳ Testando conexão com a nuvem...', '');
+  fetch(`https://api.jsonbin.io/v3/b/${NUVEM_BIN_ID}/latest`, {
+    method: 'GET',
+    headers: { 'X-Master-Key': NUVEM_API_KEY }
+  })
+  .then(async res=>{
+    if(!res.ok) throw new Error(await lerErroJsonBin(res));
+    return res.json();
+  })
+  .then(json=>{
+    const dados = json && json.record ? json.record : json;
+    const qtdOficinas = Array.isArray(dados?.oficinas) ? dados.oficinas.length : '?';
+    const salvoEm = dados?.salvo_em || 'desconhecido';
+    alert(`✓ Conexão com a nuvem OK.\n\nOficinas salvas na nuvem: ${qtdOficinas}\nÚltimo salvamento: ${salvoEm}`);
+    mostrarToast('Conexão com a nuvem OK.','sucesso');
+  })
+  .catch(err=>{
+    console.error('Erro ao testar conexão com a nuvem:', err);
+    alert('✗ Falha na conexão com a nuvem:\n\n' + err.message);
+    mostrarToast('⚠ Falha ao conectar com a nuvem.','erro');
+  });
+}
+
 function gerarPublicarBackupOficial(){
   const payload = {
     proximoIdOficina, proximoIdRota,
@@ -1669,22 +1725,38 @@ function gerarPublicarBackupOficial(){
 
   if(NUVEM_API_KEY && NUVEM_API_KEY !== 'SUA_CHAVE_API_AQUI' &&
      NUVEM_BIN_ID  && NUVEM_BIN_ID  !== 'SEU_BIN_ID_AQUI'){
+
+    // Payload enviado à nuvem: remove fotos (base64) para não estourar o limite
+    // de tamanho do plano gratuito da JSONBin (100KB por Bin). As fotos continuam
+    // salvas normalmente no dispositivo e no arquivo de download local.
+    const payloadNuvem = {
+      ...payload,
+      oficinas: oficinas.map(({fotoDataUrl, ...resto})=>resto)
+    };
+    const corpoNuvem = JSON.stringify(payloadNuvem);
+    const tamanhoKB = (new Blob([corpoNuvem]).size / 1024);
+
+    if(tamanhoKB > 95){
+      console.warn(`Backup com ${tamanhoKB.toFixed(1)}KB — próximo ou acima do limite gratuito da JSONBin (100KB).`);
+      mostrarToast(`⚠ Backup com ${tamanhoKB.toFixed(0)}KB — pode exceder o limite gratuito da nuvem (100KB).`,'erro');
+    }
+
     fetch(`https://api.jsonbin.io/v3/b/${NUVEM_BIN_ID}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'X-Master-Key': NUVEM_API_KEY },
-      body: JSON.stringify(payload)
+      body: corpoNuvem
     })
-    .then(res=>{
-      if(!res.ok) throw new Error('HTTP '+res.status);
+    .then(async res=>{
+      if(!res.ok) throw new Error(await lerErroJsonBin(res));
       return res.json();
     })
     .then(()=>{
       console.log('Backup oficial publicado na nuvem.');
-      mostrarToast('Backup publicado na nuvem com sucesso.','sucesso');
+      mostrarToast('☁️ Backup publicado na nuvem com sucesso.','sucesso');
     })
     .catch(err=>{
       console.error('Erro ao publicar backup oficial na nuvem:', err);
-      mostrarToast('⚠ Falha ao publicar backup na nuvem.','erro');
+      mostrarToast('⚠ Falha ao publicar na nuvem: ' + err.message, 'erro');
     });
   } else {
     mostrarToast('⚠ Nuvem não configurada — apenas o download local foi gerado.','erro');
