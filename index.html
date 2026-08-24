@@ -213,6 +213,28 @@ select.sel:focus{ outline:none; border-color:var(--primaria); box-shadow:0 0 0 3
 .chip-remover:active{ background:var(--perigo); color:#fff; }
 .chip-remover svg{ width:16px; height:16px; }
 
+/* Ações compactas (Fotos / Mapa) na lista de selecionadas da rota */
+.chip-acao{
+  display:inline-flex; align-items:center; gap:4px; flex-shrink:0;
+  height:28px; padding:0 8px; border-radius:14px; border:1px solid var(--borda);
+  background:var(--fundo); color:var(--texto-sec); font-size:11.5px; font-weight:600;
+}
+.chip-acao:active{ background:var(--fundo-card-hover); color:var(--texto); }
+.chip-acao svg{ width:14px; height:14px; }
+.item-lista .acoes-rota{ display:flex; align-items:center; gap:4px; flex-shrink:0; }
+
+/* Botão câmera rápida no card de oficinas */
+.btn-foto-rapida{
+  width:36px; height:36px; border-radius:18px; border:1px solid var(--borda);
+  background:var(--fundo); color:var(--texto-sec); flex-shrink:0; padding:0;
+  display:flex; align-items:center; justify-content:center;
+}
+.btn-foto-rapida:active{ background:var(--fundo-card-hover); color:var(--primaria); }
+.btn-foto-rapida.tem-foto{ color:var(--sucesso); border-color:rgba(34,197,94,.35); }
+.btn-foto-rapida svg{ width:18px; height:18px; }
+.card-oficina .acoes-extra{ display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+.card-oficina .acoes-extra .btn{ flex:1; min-width:100px; }
+
 .badge{
   display:inline-flex; align-items:center; gap:2px;
   font-size:10.5px; font-weight:600; padding:2px 8px; border-radius:9999px; margin-left:4px;
@@ -518,6 +540,38 @@ body.modo-desktop #topbar{
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- Inputs ocultos para foto rápida (câmera / galeria) -->
+<input type="file" id="inputFotoCamera" accept="image/*" capture="environment" style="display:none" onchange="aoEscolherFotoRapida(event)">
+<input type="file" id="inputFotoGaleria" accept="image/*" style="display:none" onchange="aoEscolherFotoRapida(event)">
+
+<!-- ===================== MODAL: FOTO RÁPIDA ===================== -->
+<div class="modal-overlay oculto" id="modalFotoRapida">
+  <div class="modal-caixa">
+    <h2 style="display:flex;align-items:center;gap:8px;"><span class="icon" style="width:20px;height:20px;color:var(--primaria);"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></span> Foto da oficina</h2>
+    <div class="legenda" id="legendaFotoRapida">Escolha como adicionar a foto.</div>
+    <div class="linha-btns" style="display:flex;flex-direction:column;gap:8px;">
+      <button class="btn primario" id="btnFotoTirar" onclick="iniciarCapturaFoto('camera')">📷 Tirar foto</button>
+      <button class="btn" id="btnFotoProcurar" onclick="iniciarCapturaFoto('galeria')">📁 Procurar no dispositivo</button>
+      <button class="btn" id="btnFotoVer" style="display:none" onclick="verFotoDoModalRapida()">👁 Ver foto</button>
+      <button class="btn" id="btnFotoTrocar" style="display:none" onclick="iniciarCapturaFoto('galeria')">Trocar foto</button>
+      <button class="btn perigo" id="btnFotoExcluir" style="display:none" onclick="excluirFotoRapida()">Excluir foto</button>
+      <button class="btn" onclick="fecharModalFotoRapida()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL: SAIR DO APLICATIVO ===================== -->
+<div class="modal-overlay oculto" id="modalSairApp">
+  <div class="modal-caixa">
+    <h2>Sair do aplicativo?</h2>
+    <div class="legenda">Deseja realmente sair do Equipeças Rotas?</div>
+    <div class="linha-btns">
+      <button class="btn" onclick="fecharModalSairApp()">Cancelar</button>
+      <button class="btn perigo" onclick="confirmarSairApp()">Sair</button>
+    </div>
+  </div>
+</div>
 
 <!-- ===================== MODAL: SENHA ADMIN ===================== -->
 <div class="modal-overlay oculto" id="modalSenha">
@@ -1136,6 +1190,34 @@ function extrairCoordsTexto(texto){
   return null;
 }
 
+/** Gera URL do Google Maps para UMA oficina (prioridade: coords → mapsLink → endereço). */
+function gerarLinkMapaOficina(of){
+  if(!of) return null;
+  if(coordsValidas(of.lat, of.lng)){
+    return `https://www.google.com/maps/search/?api=1&query=${of.lat},${of.lng}`;
+  }
+  if(of.mapsLink && String(of.mapsLink).trim()){
+    return String(of.mapsLink).trim();
+  }
+  const partes = [of.endereco, of.cidade, of.estado].filter(Boolean).join(', ');
+  if(partes){
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(partes)}`;
+  }
+  return null;
+}
+
+/** Abre no Maps apenas a oficina indicada (não altera a rota). */
+function abrirMapaOficina(id){
+  const of = oficinas.find(o=>o.id===id);
+  if(!of) return;
+  const url = gerarLinkMapaOficina(of);
+  if(!url){
+    mostrarToast('Localização não cadastrada. Informe coordenadas, link do Maps ou endereço.','erro');
+    return;
+  }
+  window.open(url, '_blank');
+}
+
 function gerarLinkRota(pontosOrdenados, origem, transporte, modo){
   const destino = pontosOrdenados[pontosOrdenados.length-1];
   const intermediarios = pontosOrdenados.slice(0,-1);
@@ -1224,20 +1306,98 @@ function mostrarPagina(nome){
 function irPara(nome){
   pilha = [nome];
   mostrarPagina(nome);
+  sincronizarHistoricoNavegacao();
 }
 
 function abrirSubpagina(nome){
   pilha.push(nome);
   mostrarPagina(nome);
+  sincronizarHistoricoNavegacao();
 }
 
 function voltar(){
   if(pilha.length>1){
     pilha.pop();
     mostrarPagina(pilha[pilha.length-1]);
+    sincronizarHistoricoNavegacao();
   } else {
-    irPara('inicio');
+    // Já na raiz: se não for início, volta ao início; se for início, pergunta sair
+    if(pilha[0] !== 'inicio'){
+      irPara('inicio');
+    } else {
+      abrirModalSairApp();
+    }
   }
+}
+
+/** Empilha estado no History API para o botão físico/gesto Voltar do dispositivo. */
+function sincronizarHistoricoNavegacao(){
+  try{
+    history.pushState({ app:'equipecas', pilha: pilha.slice() }, '');
+  }catch(_){ /* file:// ou ambiente restrito */ }
+}
+
+/**
+ * Trata o botão físico/gesto Voltar:
+ * 1) fecha modais abertos;
+ * 2) senão, segue a pilha do app (voltar());
+ * 3) na página inicial, pergunta se deseja sair.
+ */
+function aoPressionarVoltarDispositivo(ev){
+  // Reinsere estado para não sair da página sem confirmação
+  try{ history.pushState({ app:'equipecas', pilha: pilha.slice() }, ''); }catch(_){}
+
+  // Prioridade: fechar modais visíveis
+  const modais = ['modalSairApp','modalFotoRapida','modalSenha','modalModoUI','modalAdmin','modalRestaurarOpcoes','modalLixeira'];
+  for(const id of modais){
+    const el = document.getElementById(id);
+    if(el && !el.classList.contains('oculto')){
+      el.classList.add('oculto');
+      return;
+    }
+  }
+
+  if(pilha.length > 1){
+    // Navega uma página para trás na pilha do app (sem chamar irPara para não resetar)
+    pilha.pop();
+    mostrarPagina(pilha[pilha.length-1]);
+    return;
+  }
+
+  // Raiz: se não estiver no início, vai para o início; senão pergunta sair
+  if(pilha[0] && pilha[0] !== 'inicio'){
+    pilha = ['inicio'];
+    mostrarPagina('inicio');
+    return;
+  }
+  abrirModalSairApp();
+}
+
+function abrirModalSairApp(){
+  document.getElementById('modalSairApp').classList.remove('oculto');
+}
+function fecharModalSairApp(){
+  document.getElementById('modalSairApp').classList.add('oculto');
+}
+function confirmarSairApp(){
+  fecharModalSairApp();
+  // Cordova / Capacitor
+  try{
+    if(window.navigator && window.navigator.app && typeof window.navigator.app.exitApp === 'function'){
+      window.navigator.app.exitApp();
+      return;
+    }
+  }catch(_){}
+  try{
+    if(window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App){
+      window.Capacitor.Plugins.App.exitApp();
+      return;
+    }
+  }catch(_){}
+  // Tentativa genérica (pode ser bloqueada pelo navegador)
+  try{ window.close(); }catch(_){}
+  // Fallback amigável: não quebra o app
+  mostrarToast('Feche a aba ou use o gerenciador de apps para sair.','');
 }
 
 function atualizarLauncher(){
@@ -1254,11 +1414,12 @@ function statusRota(rota){
   const n = rota.oficinaIds.length;
   if(n===0) return 'Vazia';
   if(rota.otimizada) return 'Otimizada';
+  if(n===1) return '1 oficina';
   if(n>=2) return 'Pronta para otimização';
   return 'Parcial';
 }
 function corStatus(status){
-  return {Vazia:'var(--texto-desab)', Parcial:'var(--alerta)',
+  return {Vazia:'var(--texto-desab)', Parcial:'var(--alerta)', '1 oficina':'var(--primaria)',
     'Pronta para otimização':'var(--primaria)', Otimizada:'var(--sucesso)'}[status] || 'var(--texto-sec)';
 }
 
@@ -1416,10 +1577,32 @@ function renderListaSelecionadas(){
     if(!of) return;
     const linha = document.createElement('div');
     linha.className='item-lista';
+    // Fotos + Mapa por oficina (não alteram a seleção da rota)
     linha.innerHTML = `<span class="txt">${escapeHtml(of.nome)}${of.cidade? ' — '+escapeHtml(of.cidade):''}</span>
-      <button class="chip-remover" title="Remover desta rota" onclick="removerDaRota(${of.id}, '${escapeAttr(of.nome)}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>`;
+      <div class="acoes-rota">
+        <button type="button" class="chip-acao" title="Fotos" onclick="event.stopPropagation(); verFotoNaRota(${of.id})">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+          Fotos
+        </button>
+        <button type="button" class="chip-acao" title="Abrir no mapa" onclick="event.stopPropagation(); abrirMapaOficina(${of.id})">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+          Mapa
+        </button>
+        <button class="chip-remover" title="Remover desta rota" onclick="event.stopPropagation(); removerDaRota(${of.id}, '${escapeAttr(of.nome)}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+      </div>`;
     box.appendChild(linha);
   });
+}
+
+/** Abre a foto da oficina na rota; se não houver, informa o usuário. */
+function verFotoNaRota(id){
+  const of = oficinas.find(o=>o.id===id);
+  if(!of) return;
+  if(of.fotoDataUrl){
+    abrirFotoOficina(id);
+  } else {
+    mostrarToast('Nenhuma foto cadastrada para esta oficina.','erro');
+  }
 }
 
 function removerDaRota(oficinaId, nomeOficina){
@@ -1516,9 +1699,79 @@ function capturarGPSParaOrigem(){
 
 async function otimizarRotaAtual(){
   const rota = rotas.find(r=>r.id===rotaAtualId);
-  const selecionadas = rota.oficinaIds.map(id=>oficinas.find(o=>o.id===id)).filter(o=>o && coordsValidas(o.lat, o.lng));
-  if(selecionadas.length<2){
-    mostrarToast('Selecione ao menos 2 oficinas com coordenadas para otimizar.','erro');
+  const todasSelecionadas = rota.oficinaIds.map(id=>oficinas.find(o=>o.id===id)).filter(Boolean);
+  if(todasSelecionadas.length === 0){
+    mostrarToast('Selecione ao menos 1 oficina para gerar o mapa.','erro');
+    return;
+  }
+
+  const transporte = document.getElementById('selTransporte').value;
+
+  /* ---- Caso especial: exatamente 1 oficina (sem exigir segunda) ---- */
+  if(todasSelecionadas.length === 1){
+    const of = todasSelecionadas[0];
+    document.getElementById('btnCopiarLink').disabled=true;
+    document.getElementById('btnAbrirMaps').disabled=true;
+    document.getElementById('btnWhatsApp').disabled=true;
+
+    let urlPreview = null;
+    let urlWhatsApp = null;
+    let dist = null;
+
+    if(coordsValidas(of.lat, of.lng)){
+      const modoOrigem = document.getElementById('selOrigem').value;
+      if(modoOrigem === 'gps' && gpsOrigem.lat == null){
+        const ok = await capturarGPSParaOrigem();
+        if(!ok){
+          // ainda assim abre o ponto da oficina
+        }
+      }
+      const origemCalc = resolverOrigemCalculo();
+      const ponto = { lat: of.lat, lng: of.lng, id: of.id, label: of.nome };
+      urlPreview = gerarLinkRota([ponto], origemCalc, transporte, 'preview');
+      urlWhatsApp = gerarLinkRota([ponto], null, transporte, 'whatsapp');
+      if(origemCalc && coordsValidas(origemCalc.lat, origemCalc.lon != null ? origemCalc.lon : origemCalc.lng)){
+        const olng = origemCalc.lon != null ? origemCalc.lon : origemCalc.lng;
+        dist = haversine({lat:+origemCalc.lat, lng:+olng}, ponto);
+      }
+    } else {
+      // Sem coords: tenta mapsLink ou endereço
+      const url = gerarLinkMapaOficina(of);
+      if(!url){
+        mostrarToast('Cadastre a localização desta oficina (coordenadas, link do Maps ou endereço).','erro');
+        document.getElementById('statusOtimizacao').textContent = 'Localização insuficiente para abrir o mapa.';
+        return;
+      }
+      urlPreview = url;
+      urlWhatsApp = url;
+    }
+
+    document.getElementById('statusOtimizacao').textContent =
+      dist != null ? `1 oficina — ${dist.toFixed(1)} km até a origem` : `1 oficina — ${of.nome}`;
+    const lista = document.getElementById('listaResultado');
+    lista.innerHTML = '';
+    const l = document.createElement('div');
+    l.className = 'item-lista';
+    l.innerHTML = `<span class="txt">1. ${escapeHtml(of.nome)}</span>`;
+    lista.appendChild(l);
+
+    rota.otimizada = true;
+    rota.distancia = dist;
+    rota.mapsUrl = urlPreview;
+    rota.algoritmo = 'Ponto único';
+    rota._mapsUrlAtual = urlPreview;
+    rota._mapsUrlWhatsApp = urlWhatsApp;
+    document.getElementById('btnCopiarLink').disabled = false;
+    document.getElementById('btnAbrirMaps').disabled = false;
+    document.getElementById('btnWhatsApp').disabled = false;
+    salvarEstado();
+    return;
+  }
+
+  /* ---- 2+ oficinas: algoritmo existente (OSRM + fallback) ---- */
+  const selecionadas = todasSelecionadas.filter(o => coordsValidas(o.lat, o.lng));
+  if(selecionadas.length < 2){
+    mostrarToast('Para otimizar com 2+ oficinas, cada uma precisa de coordenadas válidas.','erro');
     return;
   }
 
@@ -1538,7 +1791,6 @@ async function otimizarRotaAtual(){
 
   const pontos = selecionadas.map(o=>({lat:o.lat, lng:o.lng, id:o.id, label:o.nome}));
   const algoritmo = document.getElementById('selAlgoritmo').value;
-  const transporte = document.getElementById('selTransporte').value;
   const origemCalc = resolverOrigemCalculo();
 
   try{
@@ -1709,16 +1961,21 @@ function renderListaOficinas(reordenar){
     const aberto = oficinaExpandidaId === of.id;
     const card = document.createElement('div');
     card.className = 'card-oficina' + (aberto ? ' aberto' : '');
+    const temFoto = !!of.fotoDataUrl;
     card.innerHTML = `
       <div class="cabecalho" onclick="alternarExpandirOficina(${of.id})">
         <div class="info">
           <div class="nome">${escapeHtml(of.nome)}
             ${of.verificada? '<span class="badge verificada">✓</span>':''}
-            ${of.fotoDataUrl? '<span class="badge foto">Foto</span>':''}
+            ${temFoto? '<span class="badge foto">Foto</span>':''}
             <span class="seta"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
           </div>
           <div class="meta">${of.cidade? escapeHtml(of.cidade)+(of.estado? ' — '+escapeHtml(of.estado):'') : (of.endereco? escapeHtml(of.endereco):'Sem cidade')}</div>
         </div>
+        <button type="button" class="btn-foto-rapida${temFoto?' tem-foto':''}" title="${temFoto?'Ver / gerenciar foto':'Adicionar foto'}"
+          onclick="event.stopPropagation(); acaoFotoRapida(${of.id})">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+        </button>
         <div class="distancia">${distTxt}</div>
       </div>
       <div class="detalhes">
@@ -1726,6 +1983,13 @@ function renderListaOficinas(reordenar){
           <button class="btn pequeno" onclick="event.stopPropagation(); editarOficina(${of.id})"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg> Editar</button>
           <button class="btn perigo pequeno" onclick="event.stopPropagation(); excluirOficinaDireto(${of.id}, '${escapeAttr(of.nome)}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg> Excluir</button>
         </div>
+        ${temFoto ? `<div class="acoes-extra">
+          <button class="btn pequeno" onclick="event.stopPropagation(); abrirFotoOficina(${of.id})">Ver foto</button>
+          <button class="btn pequeno" onclick="event.stopPropagation(); abrirModalFotoRapida(${of.id}, true)">Trocar foto</button>
+          <button class="btn perigo pequeno" onclick="event.stopPropagation(); excluirFotoOficina(${of.id})">Excluir foto</button>
+        </div>` : `<div class="acoes-extra">
+          <button class="btn pequeno" onclick="event.stopPropagation(); abrirModalFotoRapida(${of.id}, false)">Adicionar foto</button>
+        </div>`}
       </div>`;
     box.appendChild(card);
   });
@@ -1863,6 +2127,106 @@ function capturarLocalizacaoGPS(){
     },
     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
   );
+}
+
+/* =========================================================================
+   FOTOS RÁPIDAS (lista de oficinas) — reutiliza fotoDataUrl + salvarEstado
+========================================================================= */
+let _fotoRapidaOficinaId = null;
+
+/** Abre a foto em nova aba/janela a partir do id da oficina. */
+function abrirFotoOficina(id){
+  const of = oficinas.find(o=>o.id===id);
+  if(!of || !of.fotoDataUrl){
+    mostrarToast('Nenhuma foto cadastrada.','erro');
+    return;
+  }
+  const w = window.open('', '_blank');
+  if(!w){ mostrarToast('Permita pop-ups para visualizar a foto.','erro'); return; }
+  w.document.write(`<title>Foto — ${escapeHtml(of.nome||'')}</title><body style="margin:0;background:#111;display:flex;align-items:center;justify-content:center;min-height:100vh;"><img src="${of.fotoDataUrl}" style="max-width:100%;max-height:100vh;"></body>`);
+}
+
+/**
+ * Toque no ícone de câmera na lista:
+ * - com foto → abre a foto;
+ * - sem foto → modal Tirar / Procurar.
+ */
+function acaoFotoRapida(id){
+  const of = oficinas.find(o=>o.id===id);
+  if(!of) return;
+  if(of.fotoDataUrl){
+    abrirFotoOficina(id);
+  } else {
+    abrirModalFotoRapida(id, false);
+  }
+}
+
+function abrirModalFotoRapida(id, gerenciar){
+  _fotoRapidaOficinaId = id;
+  const of = oficinas.find(o=>o.id===id);
+  const tem = !!(of && of.fotoDataUrl);
+  document.getElementById('legendaFotoRapida').textContent = tem
+    ? `Gerenciar foto de "${of.nome||'oficina'}".`
+    : `Adicionar foto em "${(of&&of.nome)||'oficina'}".`;
+  document.getElementById('btnFotoTirar').style.display = '';
+  document.getElementById('btnFotoProcurar').style.display = '';
+  document.getElementById('btnFotoVer').style.display = tem ? '' : 'none';
+  document.getElementById('btnFotoTrocar').style.display = tem ? '' : 'none';
+  document.getElementById('btnFotoExcluir').style.display = tem ? '' : 'none';
+  document.getElementById('modalFotoRapida').classList.remove('oculto');
+}
+
+function fecharModalFotoRapida(){
+  document.getElementById('modalFotoRapida').classList.add('oculto');
+  _fotoRapidaOficinaId = null;
+}
+
+function verFotoDoModalRapida(){
+  if(_fotoRapidaOficinaId != null) abrirFotoOficina(_fotoRapidaOficinaId);
+}
+
+function iniciarCapturaFoto(origem){
+  // origem: 'camera' | 'galeria'
+  const input = document.getElementById(origem === 'camera' ? 'inputFotoCamera' : 'inputFotoGaleria');
+  if(!input) return;
+  input.value = '';
+  input.click();
+}
+
+/** Lê o arquivo e grava imediatamente em fotoDataUrl da oficina. */
+function aoEscolherFotoRapida(ev){
+  const arquivo = ev.target.files && ev.target.files[0];
+  if(!arquivo || _fotoRapidaOficinaId == null) return;
+  const idAlvo = _fotoRapidaOficinaId;
+  const leitor = new FileReader();
+  leitor.onload = ()=>{
+    const of = oficinas.find(o=>o.id===idAlvo);
+    if(!of) return;
+    of.fotoDataUrl = leitor.result;
+    salvarEstado();
+    fecharModalFotoRapida();
+    renderListaOficinas(false);
+    mostrarToast('Foto salva.','sucesso');
+  };
+  leitor.onerror = ()=> mostrarToast('Não foi possível ler a imagem.','erro');
+  leitor.readAsDataURL(arquivo);
+}
+
+function excluirFotoOficina(id){
+  const of = oficinas.find(o=>o.id===id);
+  if(!of || !of.fotoDataUrl) return;
+  if(!confirm(`Excluir a foto de "${of.nome}"?`)) return;
+  of.fotoDataUrl = null;
+  salvarEstado();
+  renderListaOficinas(false);
+  mostrarToast('Foto excluída.','sucesso');
+}
+
+function excluirFotoRapida(){
+  if(_fotoRapidaOficinaId == null) return;
+  const id = _fotoRapidaOficinaId;
+  fecharModalFotoRapida();
+  excluirFotoOficina(id);
 }
 
 function aoEscolherFotoOficina(ev){
@@ -2354,6 +2718,14 @@ if('serviceWorker' in navigator){
 recalcularOrdemPorDistancia();
 carregarModoUI(); // restaura Desktop/Mobile do localStorage
 mostrarPagina('inicio');
+
+/* Botão físico / gesto Voltar do dispositivo → mesma pilha do app */
+try{
+  history.pushState({ app:'equipecas', pilha:['inicio'] }, '');
+  window.addEventListener('popstate', aoPressionarVoltarDispositivo);
+}catch(e){
+  console.warn('History API indisponível para botão Voltar:', e);
+}
 </script>
 </body>
 </html>
