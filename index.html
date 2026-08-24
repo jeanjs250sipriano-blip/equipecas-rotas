@@ -260,6 +260,62 @@ hr{ border:none; border-top:1px solid var(--borda); margin:16px 0; }
 #btnConfigTopo:active{ background:var(--fundo-card-hover); }
 #btnConfigTopo svg{ width:20px; height:20px; }
 
+/* === Alternador Desktop/Mobile (protegido por senha) === */
+#btnModoTopo{
+  background:none; border:none; color:var(--texto);
+  width:40px; height:40px; border-radius:20px; display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; padding:0;
+}
+#btnModoTopo:active{ background:var(--fundo-card-hover); }
+#btnModoTopo svg{ width:20px; height:20px; }
+/* Agrupa botões à direita da topbar */
+#topbar-acoes{
+  display:flex; align-items:center; gap:2px; flex-shrink:0; margin-left:auto;
+}
+
+/*
+ * Modo Desktop: layout amplo otimizado para telas grandes.
+ * Regras fluidas (max-width + width:100%) evitam quebra se o modo
+ * for forçado em celular — o conteúdo apenas usa a largura disponível.
+ */
+body.modo-desktop #app{
+  max-width:min(1120px, 100%);
+  width:100%;
+  margin:0 auto;
+  min-height:100vh;
+  box-shadow:0 0 64px rgba(0,0,0,.45);
+}
+body.modo-desktop #topbar{
+  padding:0 16px;
+  height:56px;
+}
+body.modo-desktop #tituloTopo{ font-size:17px; }
+body.modo-desktop .pagina{
+  padding:24px 28px calc(var(--bottombar-h) + 28px) 28px;
+}
+body.modo-desktop .grid-launcher{
+  grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+  gap:16px;
+  margin-top:24px;
+}
+body.modo-desktop .card-launcher{
+  min-height:88px;
+  padding:18px 16px;
+}
+body.modo-desktop .card-launcher .nome{ font-size:15.5px; }
+body.modo-desktop .card-launcher .desc{ font-size:12.5px; }
+body.modo-desktop .titulo-pagina{ font-size:22px; }
+body.modo-desktop .modal-caixa{ max-width:480px; }
+body.modo-desktop #bottombar{ padding:0 12px; }
+body.modo-desktop .linha-form-dupla{ gap:14px; }
+/* Em telas estreitas com modo desktop forçado, evita overflow horizontal */
+body.modo-desktop #app,
+body.modo-desktop .pagina,
+body.modo-desktop #topbar{
+  max-width:100%;
+  overflow-x:hidden;
+}
+
 .oculto{ display:none !important; }
 .modal-overlay{
   position:fixed; inset:0; background:rgba(2,6,23,.72); z-index:500;
@@ -288,7 +344,12 @@ hr{ border:none; border-top:1px solid var(--borda); margin:16px 0; }
   <div id="topbar">
     <button id="btnVoltarTopo" onclick="voltar()" aria-label="Voltar"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></button>
     <div id="tituloTopo">Equipeças Rotas</div>
-    <button id="btnConfigTopo" onclick="abrirModalSenha()" title="Configurações" aria-label="Configurações"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></button>
+    <!-- Ações da topbar: modo UI + configurações admin -->
+    <div id="topbar-acoes">
+      <!-- Alternador Desktop/Mobile (senha 2525). Ícone muda conforme o modo ativo. -->
+      <button id="btnModoTopo" onclick="abrirModalModoUI()" title="Alternar modo Desktop/Mobile" aria-label="Alternar modo Desktop/Mobile"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg></button>
+      <button id="btnConfigTopo" onclick="abrirModalSenha()" title="Configurações" aria-label="Configurações"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></button>
+    </div>
   </div>
 
   <div id="paginas">
@@ -468,6 +529,20 @@ hr{ border:none; border-top:1px solid var(--borda); margin:16px 0; }
     <div class="linha-btns">
       <button class="btn primario" onclick="validarSenhaAdmin()">Entrar</button>
       <button class="btn" onclick="fecharModalSenha()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL: SENHA MODO DESKTOP/MOBILE ===================== -->
+<div class="modal-overlay oculto" id="modalModoUI">
+  <div class="modal-caixa">
+    <h2 style="display:flex;align-items:center;gap:8px;"><span class="icon" style="width:20px;height:20px;color:var(--primaria);"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span> Alternar modo de interface</h2>
+    <div class="legenda" id="legendaModalModoUI">Digite a senha para alternar entre Desktop e Mobile.</div>
+    <input type="password" inputmode="numeric" id="inputSenhaModoUI" placeholder="Senha" autocomplete="off"
+      onkeydown="if(event.key==='Enter') validarSenhaModoUI();">
+    <div class="linha-btns">
+      <button class="btn primario" onclick="validarSenhaModoUI()">Confirmar</button>
+      <button class="btn" onclick="fecharModalModoUI()">Cancelar</button>
     </div>
   </div>
 </div>
@@ -1843,6 +1918,97 @@ function salvarOficina(){
 /* =========================================================================
    PAINEL DE CONFIGURAÇÕES ADMINISTRATIVAS (protegido por senha)
 ========================================================================= */
+/* =========================================================================
+   ALTERNADOR DE MODO DESKTOP / MOBILE (protegido por senha)
+   - Senha: 2525
+   - Preferência persistida em localStorage (CHAVE_MODO_UI)
+   - body.modo-desktop controla o layout via CSS
+========================================================================= */
+const SENHA_MODO_UI = '2525';
+const CHAVE_MODO_UI = 'equipecas-ui-modo'; // 'desktop' | 'mobile'
+let modoUIAtual = 'mobile'; // padrão: mobile (layout original)
+
+/** Ícones SVG reutilizados no botão de modo */
+const ICONE_MODO_PC = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>`;
+const ICONE_MODO_CELULAR = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>`;
+
+/** Lê preferência salva e aplica na interface (chamado no boot). */
+function carregarModoUI(){
+  try{
+    const salvo = localStorage.getItem(CHAVE_MODO_UI);
+    if(salvo === 'desktop' || salvo === 'mobile'){
+      modoUIAtual = salvo;
+    }
+  }catch(e){
+    console.warn('Não foi possível ler o modo de UI do localStorage:', e);
+  }
+  aplicarModoUI(modoUIAtual, false);
+}
+
+/**
+ * Aplica o modo visual e atualiza o ícone do botão.
+ * @param {'desktop'|'mobile'} modo
+ * @param {boolean} persistir - se true, grava no localStorage
+ */
+function aplicarModoUI(modo, persistir){
+  modoUIAtual = (modo === 'desktop') ? 'desktop' : 'mobile';
+  document.body.classList.toggle('modo-desktop', modoUIAtual === 'desktop');
+
+  const btn = document.getElementById('btnModoTopo');
+  if(btn){
+    if(modoUIAtual === 'desktop'){
+      // No desktop, o botão oferece a opção de voltar ao mobile
+      btn.innerHTML = ICONE_MODO_CELULAR;
+      btn.title = 'Alternar para modo Mobile';
+      btn.setAttribute('aria-label', 'Alternar para modo Mobile');
+    } else {
+      btn.innerHTML = ICONE_MODO_PC;
+      btn.title = 'Alternar para modo Desktop';
+      btn.setAttribute('aria-label', 'Alternar para modo Desktop');
+    }
+  }
+
+  if(persistir){
+    try{
+      localStorage.setItem(CHAVE_MODO_UI, modoUIAtual);
+    }catch(e){
+      console.warn('Não foi possível salvar o modo de UI:', e);
+    }
+  }
+}
+
+function abrirModalModoUI(){
+  const alvo = modoUIAtual === 'desktop' ? 'Mobile' : 'Desktop';
+  const leg = document.getElementById('legendaModalModoUI');
+  if(leg){
+    leg.textContent = `Digite a senha para alternar para o modo ${alvo}.`;
+  }
+  document.getElementById('inputSenhaModoUI').value = '';
+  document.getElementById('modalModoUI').classList.remove('oculto');
+  setTimeout(()=>{ document.getElementById('inputSenhaModoUI').focus(); }, 50);
+}
+
+function fecharModalModoUI(){
+  document.getElementById('modalModoUI').classList.add('oculto');
+}
+
+function validarSenhaModoUI(){
+  const valor = document.getElementById('inputSenhaModoUI').value;
+  if(valor !== SENHA_MODO_UI){
+    alert('Senha incorreta.');
+    return;
+  }
+  fecharModalModoUI();
+  const novo = modoUIAtual === 'desktop' ? 'mobile' : 'desktop';
+  aplicarModoUI(novo, true);
+  mostrarToast(
+    novo === 'desktop'
+      ? 'Modo Desktop ativado. Layout adaptado para telas grandes.'
+      : 'Modo Mobile ativado. Layout compacto restaurado.',
+    'sucesso'
+  );
+}
+
 const SENHA_ADMIN = '3003';
 let _arquivoRestaurarDados = null;
 
@@ -2186,6 +2352,7 @@ if('serviceWorker' in navigator){
   if(sel) sel.value = isMobileDevice() ? 'gps' : 'sede';
 })();
 recalcularOrdemPorDistancia();
+carregarModoUI(); // restaura Desktop/Mobile do localStorage
 mostrarPagina('inicio');
 </script>
 </body>
