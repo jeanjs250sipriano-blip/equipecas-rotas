@@ -224,14 +224,21 @@ select.sel:focus{ outline:none; border-color:var(--primaria); box-shadow:0 0 0 3
 .item-lista .acoes-rota{ display:flex; align-items:center; gap:4px; flex-shrink:0; }
 
 /* Botão câmera rápida no card de oficinas */
-.btn-foto-rapida{
+.btn-foto-rapida,
+.btn-mapa-rapida{
   width:36px; height:36px; border-radius:18px; border:1px solid var(--borda);
   background:var(--fundo); color:var(--texto-sec); flex-shrink:0; padding:0;
   display:flex; align-items:center; justify-content:center;
 }
-.btn-foto-rapida:active{ background:var(--fundo-card-hover); color:var(--primaria); }
+.btn-foto-rapida:active,
+.btn-mapa-rapida:active{ background:var(--fundo-card-hover); color:var(--primaria); }
 .btn-foto-rapida.tem-foto{ color:var(--sucesso); border-color:rgba(34,197,94,.35); }
-.btn-foto-rapida svg{ width:18px; height:18px; }
+.btn-mapa-rapida.tem-local{ color:var(--primaria); border-color:rgba(37,99,235,.4); }
+.btn-foto-rapida svg,
+.btn-mapa-rapida svg{ width:18px; height:18px; }
+.card-oficina .cabecalho .acoes-icones{
+  display:flex; align-items:center; gap:6px; flex-shrink:0;
+}
 .card-oficina .acoes-extra{ display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
 .card-oficina .acoes-extra .btn{ flex:1; min-width:100px; }
 
@@ -1998,6 +2005,7 @@ function renderListaOficinas(reordenar){
     const card = document.createElement('div');
     card.className = 'card-oficina' + (aberto ? ' aberto' : '');
     const temFoto = !!of.fotoDataUrl;
+    const temLocal = !!(coordsValidas(of.lat, of.lng) || (of.mapsLink && String(of.mapsLink).trim()) || of.endereco || of.cidade);
     card.innerHTML = `
       <div class="cabecalho" onclick="alternarExpandirOficina(${of.id})">
         <div class="info">
@@ -2008,10 +2016,16 @@ function renderListaOficinas(reordenar){
           </div>
           <div class="meta">${of.cidade? escapeHtml(of.cidade)+(of.estado? ' — '+escapeHtml(of.estado):'') : (of.endereco? escapeHtml(of.endereco):'Sem cidade')}</div>
         </div>
-        <button type="button" class="btn-foto-rapida${temFoto?' tem-foto':''}" title="${temFoto?'Ver / gerenciar foto':'Adicionar foto'}"
-          onclick="event.stopPropagation(); acaoFotoRapida(${of.id})">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
-        </button>
+        <div class="acoes-icones">
+          <button type="button" class="btn-mapa-rapida${temLocal?' tem-local':''}" title="Abrir no Google Maps"
+            onclick="event.stopPropagation(); abrirMapaOficina(${of.id})">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          </button>
+          <button type="button" class="btn-foto-rapida${temFoto?' tem-foto':''}" title="${temFoto?'Ver / gerenciar foto':'Adicionar foto'}"
+            onclick="event.stopPropagation(); acaoFotoRapida(${of.id})">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+          </button>
+        </div>
         <div class="distancia">${distTxt}</div>
       </div>
       <div class="detalhes">
