@@ -493,8 +493,19 @@ body.modo-desktop #topbar{
       <label class="rotulo">Telefone</label>
       <input type="text" id="ofTelefone">
 
-      <label class="rotulo">Link do Google Maps</label>
-      <input type="text" id="ofMapsLink" placeholder="Colar link do Google Maps..." oninput="aoColarLinkOficina(this.value)">
+      <label class="rotulo">Link do Google Maps (expandido)</label>
+      <input type="text" id="ofMapsLink" placeholder="Cole o link expandido do Google Maps..." onkeydown="if(event.key==='Enter'){event.preventDefault();extrairCoordsDoLinkOficina();}">
+      <div class="legenda" style="margin-top:4px;">Abra o local no Google Maps → copie o link completo da barra de endereço (não use link curto).</div>
+      <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+        <button type="button" class="btn primario" style="flex:1; min-width:140px;" onclick="extrairCoordsDoLinkOficina()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          Extrair coordenadas
+        </button>
+        <button type="button" class="btn" style="flex:0 0 auto; width:auto;" onclick="limparCoordsOficina()" title="Limpar coordenadas">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+          Limpar
+        </button>
+      </div>
 
       <button class="btn sucesso" id="btnGpsOficina" style="margin-top:12px;" onclick="capturarLocalizacaoGPS()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Usar minha localização atual (GPS)</button>
       <div class="legenda" id="ofGpsStatus" style="margin-top:6px;"></div>
@@ -502,7 +513,10 @@ body.modo-desktop #topbar{
       <label class="rotulo">ou buscar coordenadas por endereço (simulado)</label>
       <input type="text" id="ofGeoBusca" placeholder="Ex.: Rua Exemplo, 123, Curitiba - PR">
       <button class="btn pequeno" style="margin-top:8px;" onclick="buscarGeocodingOficina()">Buscar coordenadas</button>
-      <div class="legenda" id="ofCoordsLabel" style="margin-top:6px;">Sem coordenadas definidas</div>
+      <div style="display:flex; align-items:center; gap:8px; margin-top:8px; flex-wrap:wrap;">
+        <div class="legenda" id="ofCoordsLabel" style="margin:0; flex:1; min-width:140px;">Sem coordenadas definidas</div>
+        <button type="button" class="btn pequeno" style="width:auto; flex-shrink:0;" onclick="limparCoordsOficina()" title="Limpar coordenadas definidas">Limpar coordenadas</button>
+      </div>
 
       <hr>
 
@@ -1179,14 +1193,36 @@ function geocodeSimulado(texto){
   const lon = -49.20 - ((hash*7) % 400)/1000;
   return {lat, lon};
 }
+/** Extrai lat/lng de URLs expandidas do Google Maps e textos "lat,lng". */
 function extrairCoordsTexto(texto){
   if(!texto) return null;
-  let m = texto.match(/!3d(-?\d+\.\d+).*!4d(-?\d+\.\d+)/);
+  let raw = String(texto).trim();
+  // Decodifica uma vez (links com %2C etc.)
+  try{
+    const dec = decodeURIComponent(raw);
+    if(dec) raw = dec;
+  }catch(_){ /* mantém raw */ }
+
+  let m;
+  // Formato data=!3dLAT!4dLNG (comum em links expandido do Maps)
+  m = raw.match(/!3d(-?\d+\.?\d*).*!4d(-?\d+\.?\d*)/);
   if(m) return {lat:parseFloat(m[1]), lng:parseFloat(m[2])};
-  m = texto.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+  // @lat,lng,zoom (barra de endereço do Maps)
+  m = raw.match(/@(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)/);
   if(m) return {lat:parseFloat(m[1]), lng:parseFloat(m[2])};
-  m = texto.match(/[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/);
+  // ?q=lat,lng  ou  &q=lat,lng
+  m = raw.match(/[?&]q=(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)/);
   if(m) return {lat:parseFloat(m[1]), lng:parseFloat(m[2])};
+  // query= / ll= / destination= / center=
+  m = raw.match(/[?&](?:query|ll|destination|center)=(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)/i);
+  if(m) return {lat:parseFloat(m[1]), lng:parseFloat(m[2])};
+  // !2dLNG!3dLAT (ordem invertida em alguns embeds)
+  m = raw.match(/!2d(-?\d+\.?\d*).*!3d(-?\d+\.?\d*)/);
+  if(m) return {lat:parseFloat(m[2]), lng:parseFloat(m[1])};
+  // Texto puro: "-25.4284, -49.2733"
+  m = raw.match(/^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)$/);
+  if(m) return {lat:parseFloat(m[1]), lng:parseFloat(m[2])};
+
   return null;
 }
 
@@ -2072,9 +2108,59 @@ function atualizarLabelCoordsOficina(){
     el.textContent = 'Sem coordenadas definidas';
   }
 }
+/** Compat: mantido caso algum trecho antigo chame ao colar. Preferir extrairCoordsDoLinkOficina(). */
 function aoColarLinkOficina(texto){
   const c = extrairCoordsTexto(texto);
   if(c){ window._ofLat=c.lat; window._ofLon=c.lng; atualizarLabelCoordsOficina(); }
+}
+
+/**
+ * Lê o campo "Link do Google Maps" e aplica as coordenadas na oficina em edição.
+ * Exige link expandido (com @lat,lng ou !3d/!4d). Links curtos não contêm coords.
+ */
+function extrairCoordsDoLinkOficina(){
+  const input = document.getElementById('ofMapsLink');
+  const texto = (input && input.value || '').trim();
+  const feedback = document.getElementById('ofFeedback');
+
+  if(!texto){
+    if(feedback) feedback.textContent = '⚠ Cole um link do Google Maps no campo acima.';
+    mostrarToast('Cole o link expandido do Google Maps.','erro');
+    return;
+  }
+
+  // Links encurtados não trazem lat/lng na URL
+  if(/maps\.app\.goo\.gl|goo\.gl\/maps|bit\.ly|tinyurl\.com|maps\.google\.com\/\?q=https/i.test(texto)
+      && !extrairCoordsTexto(texto)){
+    if(feedback) feedback.textContent = '⚠ Link curto detectado. Abra no Maps e copie o endereço completo da barra do navegador.';
+    mostrarToast('Use o link expandido (não o link curto).','erro');
+    return;
+  }
+
+  const c = extrairCoordsTexto(texto);
+  if(!c || !coordsValidas(c.lat, c.lng)){
+    if(feedback) feedback.textContent = '⚠ Não foi possível extrair coordenadas deste link. Confira se é o link expandido.';
+    mostrarToast('Coordenadas não encontradas no link.','erro');
+    return;
+  }
+
+  window._ofLat = c.lat;
+  window._ofLon = c.lng;
+  atualizarLabelCoordsOficina();
+  if(feedback) feedback.textContent = `✓ Coordenadas extraídas: ${c.lat.toFixed(6)}, ${c.lng.toFixed(6)}`;
+  mostrarToast('Coordenadas extraídas do link.','sucesso');
+}
+
+/** Zera lat/lng temporários do formulário (não apaga o link colado). */
+function limparCoordsOficina(){
+  window._ofLat = null;
+  window._ofLon = null;
+  atualizarLabelCoordsOficina();
+  const gps = document.getElementById('ofGpsStatus');
+  if(gps) gps.textContent = '';
+  const feedback = document.getElementById('ofFeedback');
+  if(feedback) feedback.textContent = 'Coordenadas limpas.';
+  mostrarToast('Coordenadas limpas.','sucesso');
 }
 function buscarGeocodingOficina(){
   const endereco = document.getElementById('ofGeoBusca').value.trim();
