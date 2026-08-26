@@ -784,11 +784,35 @@ function salvarEstado(){
       oficinas, rotas,
       salvo_em: new Date().toISOString(),
     };
-    localStorage.setItem(CHAVE_STORAGE, JSON.stringify(payload));
+    const bruto = JSON.stringify(payload);
+    // Proteção: payloads enormes (muitas fotos base64) travam o celular no parse/save
+    if(bruto.length > 4_500_000){
+      console.warn('Payload local muito grande ('+bruto.length+' bytes). Salvando sem fotos.');
+      const semFotos = {
+        ...payload,
+        oficinas: oficinas.map(({fotoDataUrl, ...resto})=>({...resto, fotoDataUrl:null}))
+      };
+      localStorage.setItem(CHAVE_STORAGE, JSON.stringify(semFotos));
+      mostrarToast('⚠ Dados salvos sem fotos (armazenamento cheio).','erro');
+    } else {
+      localStorage.setItem(CHAVE_STORAGE, bruto);
+    }
     backupAutomaticoNuvem();
   }catch(e){
     console.error('Erro ao salvar dados localmente:', e);
-    mostrarToast('⚠ Não foi possível salvar os dados localmente.','erro');
+    // QuotaExceeded: tenta de novo sem fotos
+    try{
+      const semFotos = {
+        proximoIdOficina, proximoIdRota,
+        oficinas: oficinas.map(({fotoDataUrl, ...resto})=>({...resto, fotoDataUrl:null})),
+        rotas,
+        salvo_em: new Date().toISOString(),
+      };
+      localStorage.setItem(CHAVE_STORAGE, JSON.stringify(semFotos));
+      mostrarToast('⚠ Armazenamento cheio: fotos não foram salvas localmente.','erro');
+    }catch(e2){
+      mostrarToast('⚠ Não foi possível salvar os dados localmente.','erro');
+    }
   }
 }
 
@@ -1346,6 +1370,10 @@ function mostrarPagina(nome){
   }
 }
 
+/* Flag evita reentrada no handler de Voltar (alguns celulares disparam popstate em cascata). */
+let _tratandoVoltar = false;
+let _histBootOk = false;
+
 function irPara(nome){
   pilha = [nome];
   mostrarPagina(nome);
@@ -1362,9 +1390,9 @@ function voltar(){
   if(pilha.length>1){
     pilha.pop();
     mostrarPagina(pilha[pilha.length-1]);
-    sincronizarHistoricoNavegacao();
+    // replaceState: não empilha entradas infinitas a cada "voltar" visual
+    sincronizarHistoricoNavegacao(true);
   } else {
-    // Já na raiz: se não for início, volta ao início; se for início, pergunta sair
     if(pilha[0] !== 'inicio'){
       irPara('inicio');
     } else {
@@ -1373,47 +1401,61 @@ function voltar(){
   }
 }
 
-/** Empilha estado no History API para o botão físico/gesto Voltar do dispositivo. */
-function sincronizarHistoricoNavegacao(){
+/**
+ * Mantém uma entrada de histórico para capturar o gesto Voltar.
+ * replace=true evita crescer a pilha do navegador sem necessidade.
+ */
+function sincronizarHistoricoNavegacao(replace){
+  if(!_histBootOk) return;
   try{
-    history.pushState({ app:'equipecas', pilha: pilha.slice() }, '');
+    const estado = { app:'equipecas', pilha: pilha.slice() };
+    if(replace) history.replaceState(estado, '');
+    else history.pushState(estado, '');
   }catch(_){ /* file:// ou ambiente restrito */ }
 }
 
 /**
- * Trata o botão físico/gesto Voltar:
- * 1) fecha modais abertos;
- * 2) senão, segue a pilha do app (voltar());
- * 3) na página inicial, pergunta se deseja sair.
+ * Botão físico/gesto Voltar do dispositivo.
+ * Importante: NÃO chama pushState no início de forma agressiva (causava travamento em alguns Android).
  */
 function aoPressionarVoltarDispositivo(ev){
-  // Reinsere estado para não sair da página sem confirmação
-  try{ history.pushState({ app:'equipecas', pilha: pilha.slice() }, ''); }catch(_){}
+  if(_tratandoVoltar) return;
+  _tratandoVoltar = true;
+  try{
+    // 1) Fecha modal aberto, se houver
+    const modais = ['modalSairApp','modalFotoRapida','modalSenha','modalModoUI','modalAdmin','modalRestaurarOpcoes','modalLixeira'];
+    for(const id of modais){
+      const el = document.getElementById(id);
+      if(el && !el.classList.contains('oculto')){
+        el.classList.add('oculto');
+        // Reinsere 1 estado para continuar capturando próximos "voltar"
+        try{ history.pushState({ app:'equipecas', pilha: pilha.slice() }, ''); }catch(_){}
+        return;
+      }
+    }
 
-  // Prioridade: fechar modais visíveis
-  const modais = ['modalSairApp','modalFotoRapida','modalSenha','modalModoUI','modalAdmin','modalRestaurarOpcoes','modalLixeira'];
-  for(const id of modais){
-    const el = document.getElementById(id);
-    if(el && !el.classList.contains('oculto')){
-      el.classList.add('oculto');
+    // 2) Volta uma página na pilha do app
+    if(pilha.length > 1){
+      pilha.pop();
+      mostrarPagina(pilha[pilha.length-1]);
+      try{ history.pushState({ app:'equipecas', pilha: pilha.slice() }, ''); }catch(_){}
       return;
     }
-  }
 
-  if(pilha.length > 1){
-    // Navega uma página para trás na pilha do app (sem chamar irPara para não resetar)
-    pilha.pop();
-    mostrarPagina(pilha[pilha.length-1]);
-    return;
-  }
+    // 3) Raiz: se não for início, vai ao início; se for, pergunta sair
+    if(pilha[0] && pilha[0] !== 'inicio'){
+      pilha = ['inicio'];
+      mostrarPagina('inicio');
+      try{ history.pushState({ app:'equipecas', pilha: ['inicio'] }, ''); }catch(_){}
+      return;
+    }
 
-  // Raiz: se não estiver no início, vai para o início; senão pergunta sair
-  if(pilha[0] && pilha[0] !== 'inicio'){
-    pilha = ['inicio'];
-    mostrarPagina('inicio');
-    return;
+    try{ history.pushState({ app:'equipecas', pilha: ['inicio'] }, ''); }catch(_){}
+    abrirModalSairApp();
+  } finally {
+    // Libera após um tick — evita cascata de popstate no mesmo gesto
+    setTimeout(()=>{ _tratandoVoltar = false; }, 350);
   }
-  abrirModalSairApp();
 }
 
 function abrirModalSairApp(){
@@ -2785,47 +2827,43 @@ function restaurarSelecionadasLixeira(){
   mostrarToast(`${marcadas.length} oficina(s) restaurada(s).`,'sucesso');
 }
 
+/* Service Worker via blob foi DESATIVADO: em vários celulares Android
+   (Chrome/WebView) o registro a partir de blob: travava a aba ou o PWA
+   na instalação. O app continua funcionando online normalmente.
+   Se quiser PWA offline no futuro, use um arquivo sw.js real no mesmo domínio. */
 if('serviceWorker' in navigator){
-  const swCode = `
-    const CACHE = 'equipecas-rotas-v2';
-    self.addEventListener('install', e => {
-      e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./'])));
-      self.skipWaiting();
+  navigator.serviceWorker.getRegistrations?.().then(regs=>{
+    regs.forEach(r=>{
+      // Remove SW antigo problemático (blob) se ainda estiver ativo
+      r.unregister().catch(()=>{});
     });
-    self.addEventListener('activate', e => {
-      e.waitUntil(caches.keys().then(keys =>
-        Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-      ));
-      self.clients.claim();
-    });
-    self.addEventListener('fetch', e => {
-      e.respondWith(
-        caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('./')))
-      );
-    });
-  `;
-  const blob = new Blob([swCode], {type:'application/javascript'});
-  const swUrl = URL.createObjectURL(blob);
-  navigator.serviceWorker.register(swUrl).catch(err => {
-    console.warn('Service Worker não registrado (normal em file://):', err);
-  });
+  }).catch(()=>{});
 }
 
 (function initOrigemLista(){
   const sel = document.getElementById('selOrigemLista');
   if(sel) sel.value = isMobileDevice() ? 'gps' : 'sede';
 })();
-recalcularOrdemPorDistancia();
-carregarModoUI(); // restaura Desktop/Mobile do localStorage
-mostrarPagina('inicio');
 
-/* Botão físico / gesto Voltar do dispositivo → mesma pilha do app */
-try{
-  history.pushState({ app:'equipecas', pilha:['inicio'] }, '');
-  window.addEventListener('popstate', aoPressionarVoltarDispositivo);
-}catch(e){
-  console.warn('History API indisponível para botão Voltar:', e);
-}
+/* Boot leve: primeiro pinta a UI, depois tarefas secundárias */
+try{ carregarModoUI(); }catch(e){ console.warn('modo UI:', e); }
+try{ mostrarPagina('inicio'); }catch(e){ console.error('mostrarPagina:', e); }
+
+// Recálculo de distâncias pode ser adiado para não bloquear o 1º frame no celular
+setTimeout(()=>{
+  try{ recalcularOrdemPorDistancia(); }catch(e){ console.warn(e); }
+}, 0);
+
+/* Botão físico/gesto Voltar — registra DEPOIS do primeiro paint */
+setTimeout(()=>{
+  try{
+    history.pushState({ app:'equipecas', pilha:['inicio'] }, '');
+    _histBootOk = true;
+    window.addEventListener('popstate', aoPressionarVoltarDispositivo);
+  }catch(e){
+    console.warn('History API indisponível para botão Voltar:', e);
+  }
+}, 100);
 </script>
 </body>
 </html>
