@@ -153,6 +153,50 @@ input[type=text], input[type=search], input[type=file], input[type=url], textare
   color:#fff; background:var(--perigo); border-color:var(--perigo);
   animation:vozPulsa 1s ease-in-out infinite;
 }
+
+/* Barra de busca — Oficinas (azul + texto preto) */
+#buscaOficinas{
+  background:#3B82F6 !important;
+  border-color:#2563EB !important;
+  color:#0a0a0a !important;
+  font-weight:600;
+}
+#buscaOficinas::placeholder{
+  color:rgba(10,10,10,.55);
+  font-weight:500;
+}
+#buscaOficinas:focus{
+  box-shadow:0 0 0 3px rgba(37,99,235,.35);
+  outline:none;
+}
+/* Microfone ao lado da busca de oficinas acompanha o contraste */
+.campo-com-voz:has(#buscaOficinas) .btn-voz{
+  background:#2563EB;
+  border-color:#1D4ED8;
+  color:#0a0a0a;
+}
+
+/* Barra de busca — Rotas (mesma cor azul + texto preto da busca de oficinas) */
+#buscaRota{
+  background:#3B82F6 !important;
+  border-color:#2563EB !important;
+  color:#0a0a0a !important;
+  font-weight:600;
+}
+#buscaRota::placeholder{
+  color:rgba(10,10,10,.55);
+  font-weight:500;
+}
+#buscaRota:focus{
+  box-shadow:0 0 0 3px rgba(37,99,235,.35);
+  outline:none;
+}
+/* Microfone ao lado da busca de oficinas em Rotas acompanha o contraste */
+.campo-com-voz:has(#buscaRota) .btn-voz{
+  background:#2563EB;
+  border-color:#1D4ED8;
+  color:#0a0a0a;
+}
 @keyframes vozPulsa{
   0%,100%{ opacity:1; transform:scale(1); }
   50%{ opacity:.85; transform:scale(1.06); }
@@ -448,7 +492,7 @@ body.modo-desktop #topbar{
 
       <div class="subtitulo">Buscar / adicionar oficinas</div>
       <div class="campo-com-voz">
-        <input type="search" placeholder="Pesquisar por nome ou cidade..." id="buscaRota" oninput="renderListaTodasRota()" autocomplete="off">
+        <input type="search" placeholder="Buscar oficina nesta rota..." id="buscaRota" oninput="renderListaTodasRota()" autocomplete="off">
         <button type="button" class="btn-voz" data-campo="buscaRota" title="Ditar por voz" aria-label="Ditar por voz" onclick="iniciarDitacao('buscaRota')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></button>
       </div>
       <div class="lista-caixa" id="listaTodasRota" style="margin-top:10px; max-height:260px; overflow-y:auto;"></div>
@@ -501,7 +545,7 @@ body.modo-desktop #topbar{
       <div class="legenda" id="labelOrigemLista" style="margin-top:6px;"></div>
 
       <div class="campo-com-voz" style="margin-top:12px;">
-        <input type="search" placeholder="Pesquisar por nome, cidade ou endereço..." id="buscaOficinas" oninput="renderListaOficinas(false)" autocomplete="off">
+        <input type="search" placeholder="Buscar nas oficinas cadastradas..." id="buscaOficinas" oninput="renderListaOficinas(false)" autocomplete="off">
         <button type="button" class="btn-voz" data-campo="buscaOficinas" title="Ditar por voz" aria-label="Ditar por voz" onclick="iniciarDitacao('buscaOficinas')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></button>
       </div>
       <div class="linha-btns" style="margin-top:10px;">
@@ -1360,6 +1404,18 @@ function gerarLinkRota(pontosOrdenados, origem, transporte, modo){
 function escapeHtml(s){
   return (s==null?'':String(s)).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 }
+
+/** Remove acentos/diacríticos para busca e ditação (Timóteo ≈ Timoteo). */
+function removerAcentos(s){
+  return (s==null?'':String(s))
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '');
+}
+
+/** Normaliza texto para comparação de busca (minúsculas + sem acento). */
+function normalizarBusca(s){
+  return removerAcentos(s).toLowerCase().trim();
+}
 function escapeAttr(s){ return escapeHtml(s).replace(/'/g, '&#39;'); }
 
 function isMobileDevice(){
@@ -1761,15 +1817,15 @@ function removerDaRota(oficinaId, nomeOficina){
 
 function renderListaTodasRota(){
   const rota = rotas.find(r=>r.id===rotaAtualId);
-  const busca = document.getElementById('buscaRota').value.trim().toLowerCase();
+  const busca = normalizarBusca(document.getElementById('buscaRota').value);
   const box = document.getElementById('listaTodasRota');
   box.innerHTML='';
   const filtradas = oficinas.filter(o=>{
     if(o.deletada) return false;
     if(!busca) return true;
-    return (o.nome||'').toLowerCase().includes(busca) ||
-           (o.cidade||'').toLowerCase().includes(busca) ||
-           (o.endereco||'').toLowerCase().includes(busca);
+    return normalizarBusca(o.nome).includes(busca) ||
+           normalizarBusca(o.cidade).includes(busca) ||
+           normalizarBusca(o.endereco).includes(busca);
   });
   if(filtradas.length===0){
     box.innerHTML = '<div class="item-lista" style="color:var(--texto-sec);">Nenhuma oficina encontrada.</div>';
@@ -2073,7 +2129,7 @@ function capturarGPSParaOrigemLista(){
 function renderListaOficinas(reordenar){
   if(reordenar) recalcularOrdemPorDistancia();
 
-  const busca = (document.getElementById('buscaOficinas').value||'').trim().toLowerCase();
+  const busca = normalizarBusca(document.getElementById('buscaOficinas').value||'');
   const box = document.getElementById('listaOficinas');
   box.innerHTML='';
 
@@ -2088,9 +2144,9 @@ function renderListaOficinas(reordenar){
 
   if(busca){
     ordenadas = ordenadas.filter(o=>{
-      return (o.nome||'').toLowerCase().includes(busca) ||
-             (o.cidade||'').toLowerCase().includes(busca) ||
-             (o.endereco||'').toLowerCase().includes(busca);
+      return normalizarBusca(o.nome).includes(busca) ||
+             normalizarBusca(o.cidade).includes(busca) ||
+             normalizarBusca(o.endereco).includes(busca);
     });
   }
 
@@ -2943,6 +2999,10 @@ function iniciarDitacao(campoId){
     }
     texto = (texto || '').trim();
     if(!texto) return;
+    // Na busca (e em geral no microfone): grava sem acento para achar
+    // "Timoteo" mesmo se a fala vier como "Timóteo".
+    const camposBusca = { buscaRota:1, buscaOficinas:1 };
+    if(camposBusca[campoId]) texto = removerAcentos(texto);
     const atual = input.value || '';
     if(atual && !/\s$/.test(atual)) input.value = atual + ' ' + texto;
     else input.value = atual + texto;
