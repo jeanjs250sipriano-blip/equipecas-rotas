@@ -126,10 +126,36 @@ h1.titulo-pagina{ font-size:22px; font-weight:700; margin:2px 0 6px 0; letter-sp
 }
 .card-oficina .acoes .btn svg{ width:16px; height:16px; }
 
-input[type=text], input[type=search], input[type=file]{
+input[type=text], input[type=search], input[type=file], input[type=url], textarea{
   background:var(--fundo); border:1px solid var(--borda); border-radius:10px;
   padding:12px 14px; color:var(--texto); width:100%; font-size:15px;
   transition:border-color .15s ease;
+}
+
+/* Campo de texto + botão de microfone (ditação por voz) */
+.campo-com-voz{
+  display:flex; align-items:stretch; gap:8px; width:100%;
+}
+.campo-com-voz > input,
+.campo-com-voz > textarea{
+  flex:1; min-width:0;
+}
+.btn-voz{
+  width:44px; min-width:44px; height:auto; min-height:44px;
+  border-radius:10px; border:1px solid var(--borda);
+  background:var(--fundo-card); color:var(--texto-sec);
+  display:flex; align-items:center; justify-content:center;
+  padding:0; flex-shrink:0;
+}
+.btn-voz svg{ width:20px; height:20px; }
+.btn-voz:active{ background:var(--fundo-card-hover); color:var(--texto); }
+.btn-voz.escutando{
+  color:#fff; background:var(--perigo); border-color:var(--perigo);
+  animation:vozPulsa 1s ease-in-out infinite;
+}
+@keyframes vozPulsa{
+  0%,100%{ opacity:1; transform:scale(1); }
+  50%{ opacity:.85; transform:scale(1.06); }
 }
 input:focus{ outline:none; border-color:var(--primaria); box-shadow:0 0 0 3px rgba(37,99,235,.18); }
 label.rotulo{ display:block; margin:14px 0 6px 0; color:var(--texto-sec); font-size:12.5px; font-weight:500;}
@@ -411,14 +437,20 @@ body.modo-desktop #topbar{
 
     <!-- ===================== DETALHE DA ROTA ===================== -->
     <div class="pagina" id="pagina-rota-detalhe">
-      <input id="tituloRotaEdit" value="Rota" onchange="renomearRota(this.value)">
+      <div class="campo-com-voz">
+        <input id="tituloRotaEdit" type="text" value="Rota" onchange="renomearRota(this.value)" autocomplete="off">
+        <button type="button" class="btn-voz" data-campo="tituloRotaEdit" title="Ditar por voz" aria-label="Ditar por voz" onclick="iniciarDitacao('tituloRotaEdit')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></button>
+      </div>
       <button class="btn perigo pequeno" onclick="excluirRotaAtual()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg> Excluir rota</button>
 
       <div class="subtitulo" id="labelSelecionadas">Oficinas selecionadas (0)</div>
       <div class="lista-caixa" id="listaSelecionadas"></div>
 
       <div class="subtitulo">Buscar / adicionar oficinas</div>
-      <input type="search" placeholder="Pesquisar por nome ou cidade..." id="buscaRota" oninput="renderListaTodasRota()">
+      <div class="campo-com-voz">
+        <input type="search" placeholder="Pesquisar por nome ou cidade..." id="buscaRota" oninput="renderListaTodasRota()" autocomplete="off">
+        <button type="button" class="btn-voz" data-campo="buscaRota" title="Ditar por voz" aria-label="Ditar por voz" onclick="iniciarDitacao('buscaRota')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></button>
+      </div>
       <div class="lista-caixa" id="listaTodasRota" style="margin-top:10px; max-height:260px; overflow-y:auto;"></div>
 
       <div class="subtitulo">Ponto de partida</div>
@@ -468,7 +500,10 @@ body.modo-desktop #topbar{
       </select>
       <div class="legenda" id="labelOrigemLista" style="margin-top:6px;"></div>
 
-      <input type="search" placeholder="Pesquisar por nome, cidade ou endereço..." id="buscaOficinas" oninput="renderListaOficinas(false)" style="margin-top:12px;">
+      <div class="campo-com-voz" style="margin-top:12px;">
+        <input type="search" placeholder="Pesquisar por nome, cidade ou endereço..." id="buscaOficinas" oninput="renderListaOficinas(false)" autocomplete="off">
+        <button type="button" class="btn-voz" data-campo="buscaOficinas" title="Ditar por voz" aria-label="Ditar por voz" onclick="iniciarDitacao('buscaOficinas')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></button>
+      </div>
       <div class="linha-btns" style="margin-top:10px;">
         <button class="btn primario" onclick="novaOficinaForm()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg> Nova oficina</button>
         <button class="btn pequeno" style="flex:0 0 auto;" onclick="abrirLixeira()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg> Lixeira</button>
@@ -481,27 +516,48 @@ body.modo-desktop #topbar{
       <h1 class="titulo-pagina" id="tituloFormOficina">Nova oficina</h1>
 
       <label class="rotulo">Nome *</label>
-      <input type="text" id="ofNome" placeholder="Nome da oficina">
+      <div class="campo-com-voz">
+        <input type="text" id="ofNome" placeholder="Nome da oficina" autocomplete="off">
+        <button type="button" class="btn-voz" data-campo="ofNome" title="Ditar por voz" aria-label="Ditar por voz" onclick="iniciarDitacao('ofNome')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></button>
+      </div>
 
       <label class="rotulo">Endereço</label>
-      <input type="text" id="ofEndereco" placeholder="Rua, número">
+      <div class="campo-com-voz">
+        <input type="text" id="ofEndereco" placeholder="Rua, número" autocomplete="off">
+        <button type="button" class="btn-voz" data-campo="ofEndereco" title="Ditar por voz" aria-label="Ditar por voz" onclick="iniciarDitacao('ofEndereco')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></button>
+      </div>
 
       <div class="linha-form-dupla">
         <div>
           <label class="rotulo">Cidade</label>
-          <input type="text" id="ofCidade">
+          <div class="campo-com-voz">
+            <input type="text" id="ofCidade" autocomplete="off">
+            <button type="button" class="btn-voz" data-campo="ofCidade" title="Ditar por voz" aria-label="Ditar por voz" onclick="iniciarDitacao('ofCidade')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></button>
+          </div>
         </div>
         <div class="estreita">
           <label class="rotulo">UF</label>
-          <input type="text" id="ofEstado" maxlength="2">
+          <div class="campo-com-voz">
+            <input type="text" id="ofEstado" maxlength="2" autocomplete="off" autocapitalize="characters">
+            <button type="button" class="btn-voz" data-campo="ofEstado" title="Ditar por voz" aria-label="Ditar por voz" onclick="iniciarDitacao('ofEstado')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></button>
+          </div>
         </div>
       </div>
 
       <label class="rotulo">Telefone</label>
-      <input type="text" id="ofTelefone">
+      <div class="campo-com-voz">
+        <input type="text" id="ofTelefone" autocomplete="off" inputmode="tel">
+        <button type="button" class="btn-voz" data-campo="ofTelefone" title="Ditar por voz" aria-label="Ditar por voz" onclick="iniciarDitacao('ofTelefone')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></button>
+      </div>
 
       <label class="rotulo">Link do Google Maps (expandido)</label>
-      <input type="text" id="ofMapsLink" placeholder="Cole o link expandido do Google Maps..." onkeydown="if(event.key==='Enter'){event.preventDefault();extrairCoordsDoLinkOficina();}">
+      <div class="campo-com-voz">
+        <input type="text" id="ofMapsLink" name="maps-link-no-autofill" placeholder="Cole o link expandido do Google Maps..."
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+          data-lpignore="true" data-form-type="other"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();extrairCoordsDoLinkOficina();}">
+        <button type="button" class="btn-voz" data-campo="ofMapsLink" title="Ditar por voz" aria-label="Ditar por voz" onclick="iniciarDitacao('ofMapsLink')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></button>
+      </div>
       <div class="legenda" style="margin-top:4px;">Abra o local no Google Maps → copie o link completo da barra de endereço (não use link curto).</div>
       <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
         <button type="button" class="btn primario" style="flex:1; min-width:140px;" onclick="extrairCoordsDoLinkOficina()">
@@ -518,7 +574,10 @@ body.modo-desktop #topbar{
       <div class="legenda" id="ofGpsStatus" style="margin-top:6px;"></div>
 
       <label class="rotulo">ou buscar coordenadas por endereço (simulado)</label>
-      <input type="text" id="ofGeoBusca" placeholder="Ex.: Rua Exemplo, 123, Curitiba - PR">
+      <div class="campo-com-voz">
+        <input type="text" id="ofGeoBusca" placeholder="Ex.: Rua Exemplo, 123, Curitiba - PR" autocomplete="off">
+        <button type="button" class="btn-voz" data-campo="ofGeoBusca" title="Ditar por voz" aria-label="Ditar por voz" onclick="iniciarDitacao('ofGeoBusca')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></button>
+      </div>
       <button class="btn pequeno" style="margin-top:8px;" onclick="buscarGeocodingOficina()">Buscar coordenadas</button>
       <div style="display:flex; align-items:center; gap:8px; margin-top:8px; flex-wrap:wrap;">
         <div class="legenda" id="ofCoordsLabel" style="margin:0; flex:1; min-width:140px;">Sem coordenadas definidas</div>
@@ -2825,6 +2884,101 @@ function restaurarSelecionadasLixeira(){
   renderListaOficinas(false);
   atualizarLauncher();
   mostrarToast(`${marcadas.length} oficina(s) restaurada(s).`,'sucesso');
+}
+
+/* =========================================================================
+   DITAÇÃO POR VOZ (Web Speech API) — pt-BR
+   Botão .btn-voz ao lado dos campos de texto
+========================================================================= */
+let _reconhecimentoVoz = null;
+let _vozCampoAtivo = null;
+
+function _SpeechRecognitionCtor(){
+  return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+}
+
+/** Inicia (ou para, se já estiver ativo no mesmo campo) a ditação para o input indicado. */
+function iniciarDitacao(campoId){
+  const Ctor = _SpeechRecognitionCtor();
+  if(!Ctor){
+    mostrarToast('Ditação por voz não é suportada neste navegador. Use Chrome ou Edge.','erro');
+    return;
+  }
+  if(!window.isSecureContext && location.protocol !== 'https:' && location.hostname !== 'localhost'){
+    mostrarToast('Microfone exige HTTPS (ou localhost).','erro');
+    return;
+  }
+
+  const input = document.getElementById(campoId);
+  if(!input) return;
+
+  // Toggle: segundo toque no mesmo campo encerra
+  if(_vozCampoAtivo === campoId && _reconhecimentoVoz){
+    try{ _reconhecimentoVoz.stop(); }catch(_){}
+    return;
+  }
+
+  // Encerra sessão anterior, se houver
+  if(_reconhecimentoVoz){
+    try{ _reconhecimentoVoz.onend = null; _reconhecimentoVoz.stop(); }catch(_){}
+    _reconhecimentoVoz = null;
+    document.querySelectorAll('.btn-voz.escutando').forEach(b=>b.classList.remove('escutando'));
+  }
+
+  const btn = document.querySelector('.btn-voz[data-campo="'+campoId+'"]');
+  const rec = new Ctor();
+  rec.lang = 'pt-BR';
+  rec.interimResults = false;
+  rec.continuous = false;
+  rec.maxAlternatives = 1;
+
+  _reconhecimentoVoz = rec;
+  _vozCampoAtivo = campoId;
+  if(btn) btn.classList.add('escutando');
+
+  rec.onresult = function(ev){
+    let texto = '';
+    for(let i = ev.resultIndex; i < ev.results.length; i++){
+      if(ev.results[i].isFinal) texto += ev.results[i][0].transcript;
+    }
+    texto = (texto || '').trim();
+    if(!texto) return;
+    const atual = input.value || '';
+    if(atual && !/\s$/.test(atual)) input.value = atual + ' ' + texto;
+    else input.value = atual + texto;
+    // Dispara listeners existentes (busca, etc.)
+    try{ input.dispatchEvent(new Event('input', { bubbles:true })); }catch(_){}
+    try{ input.dispatchEvent(new Event('change', { bubbles:true })); }catch(_){}
+  };
+
+  rec.onerror = function(ev){
+    if(btn) btn.classList.remove('escutando');
+    _reconhecimentoVoz = null;
+    _vozCampoAtivo = null;
+    const err = ev && ev.error;
+    if(err === 'not-allowed' || err === 'service-not-allowed'){
+      mostrarToast('Permissão de microfone negada. Libere nas configurações do navegador.','erro');
+    } else if(err === 'no-speech'){
+      mostrarToast('Nenhuma fala detectada. Tente novamente.','erro');
+    } else if(err && err !== 'aborted'){
+      mostrarToast('Erro na ditação ('+err+').','erro');
+    }
+  };
+
+  rec.onend = function(){
+    if(btn) btn.classList.remove('escutando');
+    _reconhecimentoVoz = null;
+    _vozCampoAtivo = null;
+  };
+
+  try{
+    rec.start();
+  }catch(e){
+    if(btn) btn.classList.remove('escutando');
+    _reconhecimentoVoz = null;
+    _vozCampoAtivo = null;
+    mostrarToast('Não foi possível iniciar o microfone.','erro');
+  }
 }
 
 /* Service Worker via blob foi DESATIVADO: em vários celulares Android
