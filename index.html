@@ -345,9 +345,21 @@ select.sel:focus{ outline:none; border-color:var(--primaria); box-shadow:0 0 0 3
 
 #tituloRotaEdit{
   font-size:19px; font-weight:700; background:transparent; border:1px solid transparent;
-  border-radius:10px; padding:6px 8px; color:var(--texto); width:100%; margin-bottom:4px;
-  letter-spacing:-.01em;
+  border-radius:10px; padding:6px 8px; color:var(--texto); width:100%; margin-bottom:0;
+  letter-spacing:-.01em; flex:1; min-width:0;
 }
+.cabecalho-rota-edit{
+  display:flex; align-items:center; gap:8px; margin-bottom:8px;
+}
+.btn-excluir-rota-icone{
+  width:44px; min-width:44px; height:44px; border-radius:12px;
+  border:1px solid rgba(239,68,68,.35); background:rgba(239,68,68,.12);
+  color:var(--perigo); display:flex; align-items:center; justify-content:center;
+  padding:0; flex-shrink:0;
+}
+.btn-excluir-rota-icone svg{ width:20px; height:20px; }
+.btn-excluir-rota-icone:active{ background:rgba(239,68,68,.22); }
+
 #tituloRotaEdit:focus{ border-color:var(--primaria); background:var(--fundo-card); outline:none; box-shadow:0 0 0 3px rgba(37,99,235,.18); }
 
 .foto-preview{
@@ -505,14 +517,30 @@ body.modo-desktop #topbar{
 
     <!-- ===================== DETALHE DA ROTA ===================== -->
     <div class="pagina" id="pagina-rota-detalhe">
-      <div class="campo-com-voz">
-        <input id="tituloRotaEdit" type="text" value="Rota" onchange="renomearRota(this.value)" autocomplete="off">
-        <button type="button" class="btn-voz" data-campo="tituloRotaEdit" title="Ditar por voz" aria-label="Ditar por voz" onclick="iniciarDitacao('tituloRotaEdit')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></button>
+      <div class="cabecalho-rota-edit">
+        <input id="tituloRotaEdit" type="text" value="Rota" onchange="renomearRota(this.value)" autocomplete="off" aria-label="Nome da rota">
+        <button type="button" class="btn-excluir-rota-icone" onclick="excluirRotaAtual()" title="Excluir rota" aria-label="Excluir rota">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+        </button>
       </div>
-      <button class="btn perigo pequeno" onclick="excluirRotaAtual()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg> Excluir rota</button>
 
-      <div class="subtitulo" id="labelSelecionadas">Oficinas selecionadas (0)</div>
+      <div class="subtitulo" id="labelSelecionadas">Locais na rota (0)</div>
       <div class="lista-caixa" id="listaSelecionadas"></div>
+
+      <div class="subtitulo">Adicionar endereço (Mapbox)</div>
+      <div class="campo-com-voz">
+        <input type="text" id="rotaGeoBusca" placeholder="Ex.: Rua Biguá, 1546 - Fazenda Rio Grande" autocomplete="off"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();buscarGeocodingRota();}">
+        <button type="button" class="btn-voz" data-campo="rotaGeoBusca" title="Ditar por voz" aria-label="Ditar por voz" onclick="iniciarDitacao('rotaGeoBusca')">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+        </button>
+      </div>
+      <button type="button" class="btn primario" id="btnLocalizarRotaGeo" style="margin-top:8px;" onclick="buscarGeocodingRota()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        LOCALIZAR
+      </button>
+      <div id="listaSugestoesRotaGeo" class="lista-sugestoes-geo" aria-live="polite"></div>
+      <div class="legenda" id="rotaGeoFeedback" style="margin-top:6px;">Digite o endereço, toque em LOCALIZAR e escolha o card para incluir na rota.</div>
 
       <div class="subtitulo">Buscar / adicionar oficinas</div>
       <div class="campo-com-voz">
@@ -901,15 +929,15 @@ const MAPBOX_TOKEN = (function(){
     'cHpJaXdpWQ==',
     'U0k2SW0=',
     'TnRkR1I=',
-    'NVlqUmpNag==',
-    'RXhOVzA=',
-    'eWVIQjRaVw==',
-    'cGljSFI=',
-    'NWNEUWlmUQ==',
-    'LjJWWTk=',
-    'dDFmXzQ=',
-    'N2EzWDdoNw==',
-    'RzN2OXI=',
+    'M2JEaHlheg==',
+    'RXdiRFU=',
+    'eWVYQjJkRw==',
+    'dHpObTU=',
+    'dE9Ha2lmUQ==',
+    'Lk5XYkM=',
+    'QkRwR2k=',
+    'bFJHU2FaeQ==',
+    'S01WaTY=',
     'QQ=='
   ];
   try {
@@ -1860,7 +1888,7 @@ function criarRota(){
   let i=1;
   const nomesExistentes = new Set(rotas.map(r=>r.nome));
   while(nomesExistentes.has(`Rota ${i}`)) i++;
-  const rota = {id:proximoIdRota++, nome:`Rota ${i}`, oficinaIds:[], otimizada:false, distancia:null, mapsUrl:null, algoritmo:null};
+  const rota = {id:proximoIdRota++, nome:`Rota ${i}`, oficinaIds:[], enderecosExtras:[], otimizada:false, distancia:null, mapsUrl:null, algoritmo:null};
   rotas.push(rota);
   salvarEstado();
   renderListaRotas();
@@ -1959,13 +1987,185 @@ function resolverOrigemCalculo(){
   return null;
 }
 
+/** Garante array de endereços extras na rota (compatível com rotas antigas). */
+function garantirEnderecosExtras(rota){
+  if(!rota) return [];
+  if(!Array.isArray(rota.enderecosExtras)) rota.enderecosExtras = [];
+  return rota.enderecosExtras;
+}
+
+/** Locais da rota: oficinas cadastradas + endereços Mapbox avulsos. */
+function obterLocaisRota(rota){
+  if(!rota) return [];
+  const locais = [];
+  (rota.oficinaIds || []).forEach(id=>{
+    const of = oficinas.find(o=>o.id===id);
+    if(of && !of.deletada) locais.push(of);
+  });
+  garantirEnderecosExtras(rota).forEach(e=>{
+    locais.push({
+      id: e.id,
+      nome: e.nome || e.endereco || 'Endereço',
+      cidade: e.cidade || null,
+      endereco: e.endereco || null,
+      lat: e.lat,
+      lng: e.lng,
+      mapsLink: '',
+      _extra: true,
+      _extraId: e.id,
+    });
+  });
+  return locais;
+}
+
+let _sugestoesRotaGeo = [];
+let _proximoIdEnderecoExtra = -1;
+
+function limparSugestoesRotaGeo(){
+  _sugestoesRotaGeo = [];
+  const box = document.getElementById('listaSugestoesRotaGeo');
+  if(box) box.innerHTML = '';
+}
+
+/** Geocode Mapbox para incluir endereço avulso na rota atual (mesma API das oficinas). */
+function buscarGeocodingRota(){
+  const endereco = (document.getElementById('rotaGeoBusca') && document.getElementById('rotaGeoBusca').value || '').trim();
+  const feedback = document.getElementById('rotaGeoFeedback');
+  const btn = document.getElementById('btnLocalizarRotaGeo');
+  limparSugestoesRotaGeo();
+  if(!endereco){
+    if(feedback) feedback.textContent = 'Informe um endereço para localizar.';
+    mostrarToast('Digite o endereço antes de localizar.','erro');
+    return;
+  }
+  const token = (MAPBOX_TOKEN || '').trim();
+  if(!token){
+    if(feedback) feedback.textContent = 'Token Mapbox não configurado.';
+    mostrarToast('Token Mapbox ausente.','erro');
+    return;
+  }
+  const urlMapbox =
+    'https://api.mapbox.com/geocoding/v5/mapbox.places/' +
+    encodeURIComponent(endereco) +
+    '.json?access_token=' + encodeURIComponent(token) +
+    '&country=BR&proximity=-49.2731,-25.4284&limit=5&language=pt';
+  if(feedback) feedback.textContent = 'Buscando endereço no Mapbox...';
+  if(btn) btn.classList.add('carregando');
+  registrarUsoMapbox();
+  fetch(urlMapbox, { method:'GET' })
+    .then(async res=>{
+      const body = await res.json().catch(()=>({}));
+      if(!res.ok) throw new Error(body.message || body.error || ('HTTP '+res.status));
+      return body;
+    })
+    .then(data=>{
+      const features = Array.isArray(data.features) ? data.features : [];
+      if(!features.length){
+        if(feedback) feedback.textContent = 'Nenhum resultado para este endereço.';
+        mostrarToast('Nenhum endereço encontrado.','erro');
+        return;
+      }
+      _sugestoesRotaGeo = features.slice(0, 5).map(f=>{
+        const coords = f.center || (f.geometry && f.geometry.coordinates) || [null, null];
+        const lng = coords[0], lat = coords[1];
+        const ctx = Array.isArray(f.context) ? f.context : [];
+        const getCtx = (prefix)=>{
+          const hit = ctx.find(c => String(c.id||'').startsWith(prefix));
+          return hit ? (hit.text || hit.name || '') : '';
+        };
+        const place = f.text || f.place_name || '';
+        const address = f.address ? String(f.address) : '';
+        const bairro = getCtx('neighborhood') || getCtx('locality') || '';
+        const cidade = getCtx('place') || '';
+        const titulo = [place, address].filter(Boolean).join(', ');
+        const sub = [bairro, cidade].filter(Boolean).join(' — ') || (f.place_name || '');
+        return {
+          lat: lat != null ? Number(lat) : null,
+          lng: lng != null ? Number(lng) : null,
+          nome: titulo || (f.place_name || 'Endereço'),
+          endereco: titulo || f.place_name || '',
+          cidade: cidade || null,
+          sub,
+          place_name: f.place_name || titulo,
+        };
+      }).filter(s => Number.isFinite(s.lat) && Number.isFinite(s.lng));
+      if(!_sugestoesRotaGeo.length){
+        if(feedback) feedback.textContent = 'Resultados sem coordenadas válidas.';
+        return;
+      }
+      renderSugestoesRotaGeo();
+      if(feedback) feedback.textContent = _sugestoesRotaGeo.length + ' resultado(s) — toque no card para incluir na rota.';
+    })
+    .catch(err=>{
+      console.error('Geocode rota:', err);
+      if(feedback) feedback.textContent = 'Falha na geocodificação: ' + (err.message || err);
+      mostrarToast('Falha ao localizar endereço.','erro');
+    })
+    .finally(()=>{ if(btn) btn.classList.remove('carregando'); });
+}
+
+function renderSugestoesRotaGeo(){
+  const box = document.getElementById('listaSugestoesRotaGeo');
+  if(!box) return;
+  box.innerHTML = '';
+  _sugestoesRotaGeo.forEach((s, i)=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'card-sugestao-geo';
+    btn.innerHTML =
+      '<div class="sg-titulo">' + escapeHtml(s.nome) + '</div>' +
+      '<div class="sg-sub">' + escapeHtml(s.sub || s.place_name || '') + '</div>' +
+      '<div class="sg-coords">' + s.lat.toFixed(6) + ', ' + s.lng.toFixed(6) + '</div>';
+    btn.onclick = function(){ selecionarSugestaoRotaGeo(i); };
+    box.appendChild(btn);
+  });
+}
+
+/** Inclui endereço Mapbox na rota sem apagar oficinas já selecionadas. */
+function selecionarSugestaoRotaGeo(idx){
+  const s = _sugestoesRotaGeo[idx];
+  const rota = rotas.find(r=>r.id===rotaAtualId);
+  if(!s || !rota) return;
+  const extras = garantirEnderecosExtras(rota);
+  const item = {
+    id: _proximoIdEnderecoExtra--,
+    nome: s.nome,
+    endereco: s.endereco || s.nome,
+    cidade: s.cidade || null,
+    lat: s.lat,
+    lng: s.lng,
+  };
+  extras.push(item);
+  rota.otimizada = false;
+  salvarEstado();
+  limparSugestoesRotaGeo();
+  const input = document.getElementById('rotaGeoBusca');
+  if(input) input.value = '';
+  const feedback = document.getElementById('rotaGeoFeedback');
+  if(feedback) feedback.textContent = 'Endereço incluído na rota: ' + item.nome;
+  renderListaSelecionadas();
+  mostrarToast('Endereço adicionado à rota.','sucesso');
+}
+
+function removerEnderecoExtraRota(extraId){
+  const rota = rotas.find(r=>r.id===rotaAtualId);
+  if(!rota) return;
+  rota.enderecosExtras = garantirEnderecosExtras(rota).filter(e=>e.id !== extraId);
+  rota.otimizada = false;
+  salvarEstado();
+  renderListaSelecionadas();
+  mostrarToast('Endereço removido da rota.','sucesso');
+}
+
 function renderListaSelecionadas(){
   const rota = rotas.find(r=>r.id===rotaAtualId);
   const box = document.getElementById('listaSelecionadas');
   box.innerHTML='';
-  document.getElementById('labelSelecionadas').textContent = `Oficinas selecionadas (${rota.oficinaIds.length})`;
-  if(rota.oficinaIds.length===0){
-    box.innerHTML = '<div class="item-lista" style="color:var(--texto-sec);">Nenhuma oficina selecionada ainda.</div>';
+  const extras = garantirEnderecosExtras(rota);
+  const total = (rota.oficinaIds||[]).length + extras.length;
+  document.getElementById('labelSelecionadas').textContent = `Locais na rota (${total})`;
+  if(total===0){
+    box.innerHTML = '<div class="item-lista" style="color:var(--texto-sec);">Nenhuma oficina ou endereço selecionado ainda.</div>';
     return;
   }
   rota.oficinaIds.forEach(id=>{
@@ -1985,6 +2185,24 @@ function renderListaSelecionadas(){
           Mapa
         </button>
         <button class="chip-remover" title="Remover desta rota" onclick="event.stopPropagation(); removerDaRota(${of.id}, '${escapeAttr(of.nome)}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+      </div>`;
+    box.appendChild(linha);
+  });
+  extras.forEach(e=>{
+    const linha = document.createElement('div');
+    linha.className='item-lista';
+    const rotulo = e.nome || e.endereco || 'Endereço';
+    const sub = e.cidade ? (' — ' + e.cidade) : '';
+    linha.innerHTML = `<span class="txt">📍 ${escapeHtml(rotulo)}${escapeHtml(sub)}</span>
+      <div class="acoes-rota">
+        <button type="button" class="chip-acao" title="Abrir no mapa" onclick="event.stopPropagation(); window.open('https://www.google.com/maps/search/?api=1&query=${e.lat},${e.lng}','_blank')">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          Mapa
+        </button>
+        <button type="button" class="chip-acao" title="Remover endereço" onclick="event.stopPropagation(); removerEnderecoExtraRota(${e.id})">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+          Remover
+        </button>
       </div>`;
     box.appendChild(linha);
   });
@@ -2095,9 +2313,10 @@ function capturarGPSParaOrigem(){
 
 async function otimizarRotaAtual(){
   const rota = rotas.find(r=>r.id===rotaAtualId);
-  const todasSelecionadas = rota.oficinaIds.map(id=>oficinas.find(o=>o.id===id)).filter(Boolean);
+  // Oficinas + endereços Mapbox avulsos (não altera algoritmo OSRM/ordenação)
+  const todasSelecionadas = obterLocaisRota(rota);
   if(todasSelecionadas.length === 0){
-    mostrarToast('Selecione ao menos 1 oficina para gerar o mapa.','erro');
+    mostrarToast('Selecione ao menos 1 oficina ou endereço para gerar o mapa.','erro');
     return;
   }
 
@@ -2167,7 +2386,7 @@ async function otimizarRotaAtual(){
   /* ---- 2+ oficinas: algoritmo existente (OSRM + fallback) ---- */
   const selecionadas = todasSelecionadas.filter(o => coordsValidas(o.lat, o.lng));
   if(selecionadas.length < 2){
-    mostrarToast('Para otimizar com 2+ oficinas, cada uma precisa de coordenadas válidas.','erro');
+    mostrarToast('Para otimizar com 2+ locais, cada um precisa de coordenadas válidas.','erro');
     return;
   }
 
