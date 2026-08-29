@@ -919,7 +919,7 @@ const CHAVE_STORAGE = 'motorista_expedicao_dados_v1';
    - NUVEM_*: JSONBin (backup em nuvem)
 ========================================================================= */
 const MAPBOX_TOKEN = (function(){
-  /* Peças codificadas — montagem só em memória no navegador (token restrito por URL) */
+  /* Peças codificadas — montagem só em memória (token atual restrito por URL) */
   const _b = [
     'cGsuZXlKMQ==',
     'SWpvaWE=',
@@ -929,15 +929,15 @@ const MAPBOX_TOKEN = (function(){
     'cHpJaXdpWQ==',
     'U0k2SW0=',
     'TnRkR1I=',
-    'M2JEaHlheg==',
-    'RXdiRFU=',
-    'eWVYQjJkRw==',
-    'dHpObTU=',
-    'dE9Ha2lmUQ==',
-    'Lk5XYkM=',
-    'QkRwR2k=',
-    'bFJHU2FaeQ==',
-    'S01WaTY=',
+    'NVlqUmpNag==',
+    'RXhOVzA=',
+    'eWVIQjRaVw==',
+    'cGljSFI=',
+    'NWNEUWlmUQ==',
+    'LjJWWTk=',
+    'dDFmXzQ=',
+    'N2EzWDdoNw==',
+    'RzN2OXI=',
     'QQ=='
   ];
   try {
@@ -2842,7 +2842,12 @@ function buscarGeocodingOficina(){
     })
     .catch(err=>{
       console.error('Geocode Mapbox:', err);
-      if(feedback) feedback.textContent = 'Falha na geocodificação: ' + (err.message || err);
+      const msg = String(err.message || err);
+      let dica = msg;
+      if(/forbidden/i.test(msg)){
+        dica = 'Forbidden: token/URL. Confira se o app está em jeanjs250sipriano-blip.github.io e se o token no HTML é o atual.';
+      }
+      if(feedback) feedback.textContent = 'Falha na geocodificação: ' + dica;
       mostrarToast('Falha ao localizar endereço.','erro');
     })
     .finally(()=>{
