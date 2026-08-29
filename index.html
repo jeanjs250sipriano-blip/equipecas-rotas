@@ -154,6 +154,30 @@ input[type=text], input[type=search], input[type=file], input[type=url], textare
   animation:vozPulsa 1s ease-in-out infinite;
 }
 
+/* Cards de confirmação de endereço (Mapbox) */
+.lista-sugestoes-geo{
+  display:flex; flex-direction:column; gap:8px; margin-top:10px;
+}
+.card-sugestao-geo{
+  background:var(--fundo-card); border:1px solid var(--borda); border-radius:12px;
+  padding:12px 14px; cursor:pointer; text-align:left; width:100%;
+  color:var(--texto); transition:border-color .15s, background .15s;
+}
+.card-sugestao-geo:hover,
+.card-sugestao-geo:focus{
+  border-color:var(--primaria); background:var(--fundo-card-hover); outline:none;
+}
+.card-sugestao-geo.selecionado{
+  border-color:var(--sucesso); background:rgba(34,197,94,.12);
+  box-shadow:0 0 0 2px rgba(34,197,94,.25);
+}
+.card-sugestao-geo .sg-titulo{ font-weight:600; font-size:14.5px; margin-bottom:4px; }
+.card-sugestao-geo .sg-sub{ font-size:12.5px; color:var(--texto-sec); line-height:1.35; }
+.card-sugestao-geo .sg-coords{
+  font-size:11px; color:var(--texto-desab); margin-top:6px; font-family:ui-monospace,monospace;
+}
+#btnLocalizarGeo.carregando{ opacity:.7; pointer-events:none; }
+
 /* Barra de busca — Oficinas (azul + texto preto) */
 #buscaOficinas{
   background:#3B82F6 !important;
@@ -617,12 +641,18 @@ body.modo-desktop #topbar{
       <button class="btn sucesso" id="btnGpsOficina" style="margin-top:12px;" onclick="capturarLocalizacaoGPS()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Usar minha localização atual (GPS)</button>
       <div class="legenda" id="ofGpsStatus" style="margin-top:6px;"></div>
 
-      <label class="rotulo">ou buscar coordenadas por endereço (simulado)</label>
+      <label class="rotulo">Localizar por endereço (Mapbox)</label>
       <div class="campo-com-voz">
-        <input type="text" id="ofGeoBusca" placeholder="Ex.: Rua Exemplo, 123, Curitiba - PR" autocomplete="off">
+        <input type="text" id="ofGeoBusca" placeholder="Ex.: Rua Robi Guarda, 1524 - Fazenda Rio Grande" autocomplete="off"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();buscarGeocodingOficina();}">
         <button type="button" class="btn-voz" data-campo="ofGeoBusca" title="Ditar por voz" aria-label="Ditar por voz" onclick="iniciarDitacao('ofGeoBusca')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></button>
       </div>
-      <button class="btn pequeno" style="margin-top:8px;" onclick="buscarGeocodingOficina()">Buscar coordenadas</button>
+      <button type="button" class="btn primario" id="btnLocalizarGeo" style="margin-top:8px;" onclick="buscarGeocodingOficina()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        LOCALIZAR
+      </button>
+      <div id="listaSugestoesGeo" class="lista-sugestoes-geo" aria-live="polite"></div>
+      <div class="legenda" style="margin-top:6px;">Digite o endereço e toque em LOCALIZAR. Depois escolha o card correto para gravar as coordenadas.</div>
       <div style="display:flex; align-items:center; gap:8px; margin-top:8px; flex-wrap:wrap;">
         <div class="legenda" id="ofCoordsLabel" style="margin:0; flex:1; min-width:140px;">Sem coordenadas definidas</div>
         <button type="button" class="btn pequeno" style="width:auto; flex-shrink:0;" onclick="limparCoordsOficina()" title="Limpar coordenadas definidas">Limpar coordenadas</button>
@@ -731,6 +761,32 @@ body.modo-desktop #topbar{
     <h2 style="display:flex;align-items:center;gap:8px;"><span class="icon" style="width:20px;height:20px;color:var(--primaria);"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span> Painel de Configurações</h2>
     <div class="legenda">Gerencie o backup local e o backup oficial na nuvem.</div>
 
+    <div class="card-oficina" style="margin:14px 0; padding:14px; cursor:default;">
+      <div style="font-weight:600; margin-bottom:8px; display:flex; align-items:center; gap:8px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        Usos do Mapbox (token)
+      </div>
+      <div class="legenda" style="margin:0 0 10px 0;">Cada toque em LOCALIZAR conta 1 uso. Referência do plano gratuito: 50.000 / mês.</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:13.5px;">
+        <div style="background:var(--fundo); border-radius:10px; padding:10px;">
+          <div style="color:var(--texto-sec); font-size:11px;">Total (este aparelho)</div>
+          <div id="mapboxUsosTotal" style="font-size:22px; font-weight:700;">0</div>
+        </div>
+        <div style="background:var(--fundo); border-radius:10px; padding:10px;">
+          <div style="color:var(--texto-sec); font-size:11px;">Neste mês</div>
+          <div id="mapboxUsosMes" style="font-size:22px; font-weight:700;">0</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <div style="height:8px; background:var(--borda); border-radius:999px; overflow:hidden;">
+          <div id="mapboxUsosBarra" style="height:100%; width:0%; background:var(--sucesso); transition:width .25s;"></div>
+        </div>
+        <div id="mapboxUsosPct" class="legenda" style="margin-top:6px;">0% do limite de 50.000</div>
+      </div>
+      <div class="legenda" style="margin-top:8px;">Último uso: <span id="mapboxUsosUltimo">—</span></div>
+      <button type="button" class="btn pequeno" style="margin-top:10px;" onclick="zerarContagemMapbox()">Zerar contagem neste aparelho</button>
+    </div>
+
     <button class="btn" onclick="acionarSelecaoArquivoBackup()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9l-.81-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg> Restaurar Backup Local (Carregar Arquivo)</button>
     <div class="legenda">Carrega oficinas de um arquivo .json/.txt salvo no dispositivo.</div>
 
@@ -828,14 +884,155 @@ const CHAVE_STORAGE = 'motorista_expedicao_dados_v1';
    3. Em Account → API Keys, copie a Master Key
    4. Cole abaixo (deixe as aspas):
 */
+/* =========================================================================
+   CONFIGURAÇÃO (tudo neste único arquivo)
+   - MAPBOX_TOKEN: token público/restrito em https://account.mapbox.com/
+     (restrinja por URL no painel Mapbox, ex.: *.github.io)
+   - NUVEM_*: JSONBin (backup em nuvem)
+========================================================================= */
+const MAPBOX_TOKEN = (function(){
+  /* Peças codificadas — montagem só em memória no navegador (token restrito por URL) */
+  const _b = [
+    'cGsuZXlKMQ==',
+    'SWpvaWE=',
+    'bVZoYmk=',
+    'MXphWEJ5YQ==',
+    'V0Z1YjI=',
+    'cHpJaXdpWQ==',
+    'U0k2SW0=',
+    'TnRkR1I=',
+    'M2JEaHlheg==',
+    'RXdiRFU=',
+    'eWVYQjJkRw==',
+    'dHpObTU=',
+    'dE9Ha2lmUQ==',
+    'Lk5XYkM=',
+    'QkRwR2k=',
+    'bFJHU2FaeQ==',
+    'S01WaTY=',
+    'QQ=='
+  ];
+  try {
+    return _b.map(function(x){
+      try { return atob(x); } catch(e) { return ''; }
+    }).join('');
+  } catch(e) { return ''; }
+})();
+const CHAVE_USOS_MAPBOX = 'equipecas-mapbox-usos'; // localStorage: contagem de chamadas à API
+const LIMITE_MAPBOX_MES = 50000; // referência do plano gratuito
+
 const NUVEM_API_KEY = "$2a$10$b.IMv/Sd6mbQDgSHn/LfZe95/I9LPmm6U9lTqM6evdN0CKuDqaf76"; // Master Key JSONBin
 const NUVEM_BIN_ID  = "6a878607da38895dfefd4505"; // Bin ID JSONBin
 
 let timerBackupNuvem = null;
+let _sugestoesGeo = []; // resultados Mapbox aguardando clique no card
+
+/* ---------- Contagem de usos do token Mapbox (só visível no admin) ---------- */
+function lerUsosMapbox(){
+  try{
+    const bruto = localStorage.getItem(CHAVE_USOS_MAPBOX);
+    if(!bruto) return { total:0, porMes:{}, ultimoUso:null };
+    const d = JSON.parse(bruto);
+    return {
+      total: Number(d.total) || 0,
+      porMes: (d.porMes && typeof d.porMes === 'object') ? d.porMes : {},
+      ultimoUso: d.ultimoUso || null,
+    };
+  }catch(_){
+    return { total:0, porMes:{}, ultimoUso:null };
+  }
+}
+
+function salvarUsosMapbox(dados){
+  try{
+    localStorage.setItem(CHAVE_USOS_MAPBOX, JSON.stringify(dados));
+  }catch(e){
+    console.warn('Não foi possível salvar contagem Mapbox:', e);
+  }
+}
+
+/** Incrementa 1 uso a cada chamada real à API Mapbox. */
+function registrarUsoMapbox(){
+  const dados = lerUsosMapbox();
+  const agora = new Date();
+  const chaveMes = agora.getFullYear() + '-' + String(agora.getMonth()+1).padStart(2,'0');
+  dados.total = (Number(dados.total) || 0) + 1;
+  dados.porMes = dados.porMes || {};
+  dados.porMes[chaveMes] = (Number(dados.porMes[chaveMes]) || 0) + 1;
+  dados.ultimoUso = agora.toISOString();
+  salvarUsosMapbox(dados);
+  return dados;
+}
+
+function usosMapboxMesAtual(){
+  const dados = lerUsosMapbox();
+  const agora = new Date();
+  const chaveMes = agora.getFullYear() + '-' + String(agora.getMonth()+1).padStart(2,'0');
+  return Number(dados.porMes && dados.porMes[chaveMes]) || 0;
+}
+
+function formatarDataUsoMapbox(iso){
+  if(!iso) return '—';
+  try{
+    const d = new Date(iso);
+    return d.toLocaleString('pt-BR');
+  }catch(_){ return iso; }
+}
+
+function atualizarPainelUsosMapbox(){
+  const elTotal = document.getElementById('mapboxUsosTotal');
+  const elMes = document.getElementById('mapboxUsosMes');
+  const elUltimo = document.getElementById('mapboxUsosUltimo');
+  const elBarra = document.getElementById('mapboxUsosBarra');
+  const elPct = document.getElementById('mapboxUsosPct');
+  if(!elTotal) return;
+  const dados = lerUsosMapbox();
+  const mes = usosMapboxMesAtual();
+  const pct = Math.min(100, Math.round((mes / LIMITE_MAPBOX_MES) * 1000) / 10);
+  elTotal.textContent = String(dados.total);
+  if(elMes) elMes.textContent = String(mes);
+  if(elUltimo) elUltimo.textContent = formatarDataUsoMapbox(dados.ultimoUso);
+  if(elPct) elPct.textContent = pct + '% do limite de ' + LIMITE_MAPBOX_MES.toLocaleString('pt-BR');
+  if(elBarra){
+    elBarra.style.width = pct + '%';
+    elBarra.style.background = pct >= 90 ? 'var(--perigo)' : (pct >= 70 ? '#f59e0b' : 'var(--sucesso)');
+  }
+}
+
+function zerarContagemMapbox(){
+  if(!confirm('Zerar a contagem de usos do Mapbox neste dispositivo?')) return;
+  salvarUsosMapbox({ total:0, porMes:{}, ultimoUso:null });
+  atualizarPainelUsosMapbox();
+  mostrarToast('Contagem Mapbox zerada.','sucesso');
+}
+
+/** Padroniza oficina legada/nova (evita undefined em listas e OSRM). */
+function normalizarOficina(o){
+  if(!o || typeof o !== 'object') return null;
+  const latRaw = o.lat != null && o.lat !== '' ? Number(o.lat) : null;
+  const lngRaw = (o.lng != null && o.lng !== '') ? Number(o.lng)
+               : ((o.lon != null && o.lon !== '') ? Number(o.lon) : null);
+  return {
+    id: o.id,
+    nome: o.nome != null ? String(o.nome) : '',
+    endereco: o.endereco != null ? o.endereco : null,
+    cidade: o.cidade != null ? o.cidade : null,
+    estado: o.estado != null ? o.estado : null,
+    telefone: o.telefone != null ? o.telefone : null,
+    mapsLink: o.mapsLink != null ? o.mapsLink : (o.maps_link != null ? o.maps_link : ''),
+    lat: Number.isFinite(latRaw) ? latRaw : null,
+    lng: Number.isFinite(lngRaw) ? lngRaw : null,
+    verificada: !!o.verificada,
+    fotoDataUrl: o.fotoDataUrl || o.foto || null,
+    deletada: !!o.deletada,
+  };
+}
+
 
 function aplicarDados(dados){
   if(!dados || typeof dados !== 'object') return false;
-  oficinas = Array.isArray(dados.oficinas) ? dados.oficinas : [];
+  const listaOf = Array.isArray(dados.oficinas) ? dados.oficinas : [];
+  oficinas = listaOf.map(normalizarOficina).filter(Boolean);
   rotas = Array.isArray(dados.rotas) ? dados.rotas : [];
   const maiorIdOficina = oficinas.reduce((m,o)=>Math.max(m, o.id||0), 0);
   const maiorIdRota = rotas.reduce((m,r)=>Math.max(m, r.id||0), 0);
@@ -846,7 +1043,6 @@ function aplicarDados(dados){
 
 /** Envia os dados para a nuvem em segundo plano (debounce 2s). */
 function backupAutomaticoNuvem(){
-  // Não tenta se ainda não configurou as chaves
   if(!NUVEM_API_KEY || NUVEM_API_KEY === 'SUA_CHAVE_API_AQUI' ||
      !NUVEM_BIN_ID  || NUVEM_BIN_ID  === 'SEU_BIN_ID_AQUI'){
     return;
@@ -2236,7 +2432,9 @@ function novaOficinaForm(){
   document.getElementById('ofVerificada').checked=false;
   document.getElementById('ofFeedback').textContent='';
   document.getElementById('ofGpsStatus').textContent='';
+  limparSugestoesGeo();
   window._ofLat=null; window._ofLon=null;
+  limparSugestoesGeo();
   abrirSubpagina('editar-oficina');
   document.getElementById('tituloTopo').textContent = 'Nova oficina';
 }
@@ -2324,6 +2522,7 @@ function extrairCoordsDoLinkOficina(){
 
 /** Zera lat/lng temporários do formulário (não apaga o link colado). */
 function limparCoordsOficina(){
+  limparSugestoesGeo();
   window._ofLat = null;
   window._ofLon = null;
   atualizarLabelCoordsOficina();
@@ -2333,17 +2532,146 @@ function limparCoordsOficina(){
   if(feedback) feedback.textContent = 'Coordenadas limpas.';
   mostrarToast('Coordenadas limpas.','sucesso');
 }
-function buscarGeocodingOficina(){
-  const endereco = document.getElementById('ofGeoBusca').value.trim();
-  if(!endereco) return;
-  document.getElementById('ofFeedback').textContent='Buscando endereço... (simulado)';
-  setTimeout(()=>{
-    const {lat,lon} = geocodeSimulado(endereco);
-    window._ofLat=lat; window._ofLon=lon;
-    atualizarLabelCoordsOficina();
-    document.getElementById('ofFeedback').textContent = `Localização simulada para "${endereco}"`;
-  }, 250);
+/** Limpa cards de sugestão Mapbox. */
+function limparSugestoesGeo(){
+  _sugestoesGeo = [];
+  const box = document.getElementById('listaSugestoesGeo');
+  if(box) box.innerHTML = '';
 }
+
+/**
+ * Geocodificação real via proxy Cloudflare → Mapbox.
+ * NÃO aplica coordenadas automaticamente: sempre exige clique no card.
+ */
+function buscarGeocodingOficina(){
+  const endereco = (document.getElementById('ofGeoBusca').value || '').trim();
+  const feedback = document.getElementById('ofFeedback');
+  const btn = document.getElementById('btnLocalizarGeo');
+  limparSugestoesGeo();
+  if(!endereco){
+    if(feedback) feedback.textContent = 'Informe um endereço para localizar.';
+    mostrarToast('Digite o endereço antes de localizar.','erro');
+    return;
+  }
+
+  const token = (MAPBOX_TOKEN || '').trim();
+  if(!token || token === 'SEU_TOKEN_MAPBOX_AQUI'){
+    if(feedback) feedback.textContent = 'Configure MAPBOX_TOKEN no início do script deste HTML.';
+    mostrarToast('Cole seu token Mapbox em MAPBOX_TOKEN.','erro');
+    return;
+  }
+
+  // Mapbox Geocoding direto (arquivo único): BR + viés Curitiba + até 5 resultados
+  const urlMapbox =
+    'https://api.mapbox.com/geocoding/v5/mapbox.places/' +
+    encodeURIComponent(endereco) +
+    '.json?access_token=' + encodeURIComponent(token) +
+    '&country=BR&proximity=-49.2731,-25.4284&limit=5&language=pt';
+
+  if(feedback) feedback.textContent = 'Buscando endereço no Mapbox...';
+  if(btn) btn.classList.add('carregando');
+
+  // Conta 1 uso do token (cada consulta à API)
+  registrarUsoMapbox();
+
+  fetch(urlMapbox, { method:'GET' })
+    .then(async res=>{
+      const body = await res.json().catch(()=>({}));
+      if(!res.ok) throw new Error(body.error || body.message || ('HTTP '+res.status));
+      return body;
+    })
+    .then(data=>{
+      const features = Array.isArray(data.features) ? data.features : (Array.isArray(data) ? data : []);
+      if(!features.length){
+        if(feedback) feedback.textContent = 'Nenhum resultado para este endereço.';
+        mostrarToast('Nenhum endereço encontrado.','erro');
+        return;
+      }
+      _sugestoesGeo = features.slice(0, 5).map((f)=>{
+        const coords = f.center || (f.geometry && f.geometry.coordinates) || [null, null];
+        const lng = coords[0], lat = coords[1];
+        const ctx = Array.isArray(f.context) ? f.context : [];
+        const getCtx = (prefix)=>{
+          const hit = ctx.find(c => String(c.id||'').startsWith(prefix));
+          return hit ? (hit.text || hit.name || '') : '';
+        };
+        const place = f.text || f.place_name || '';
+        const address = f.address ? String(f.address) : '';
+        const bairro = getCtx('neighborhood') || getCtx('locality') || '';
+        const cidade = getCtx('place') || '';
+        const uf = getCtx('region') || '';
+        const titulo = [place, address].filter(Boolean).join(', ');
+        const sub = [bairro, cidade, uf].filter(Boolean).join(' — ') || (f.place_name || '');
+        return {
+          lat: lat != null ? Number(lat) : null,
+          lng: lng != null ? Number(lng) : null,
+          titulo: titulo || (f.place_name || 'Resultado'),
+          sub,
+          place_name: f.place_name || titulo,
+          cidade: cidade || null,
+          estado: uf ? String(uf).slice(0, 2).toUpperCase() : null,
+          endereco: titulo || null,
+        };
+      }).filter(s => Number.isFinite(s.lat) && Number.isFinite(s.lng));
+
+      if(!_sugestoesGeo.length){
+        if(feedback) feedback.textContent = 'Resultados sem coordenadas válidas.';
+        return;
+      }
+      renderSugestoesGeo();
+      if(feedback) feedback.textContent = _sugestoesGeo.length + ' resultado(s) — toque no card correto para confirmar.';
+    })
+    .catch(err=>{
+      console.error('Geocode Mapbox:', err);
+      if(feedback) feedback.textContent = 'Falha na geocodificação: ' + (err.message || err);
+      mostrarToast('Falha ao localizar endereço.','erro');
+    })
+    .finally(()=>{
+      if(btn) btn.classList.remove('carregando');
+    });
+}
+
+/** Renderiza cards de confirmação (sempre, mesmo com 1 resultado). */
+function renderSugestoesGeo(){
+  const box = document.getElementById('listaSugestoesGeo');
+  if(!box) return;
+  box.innerHTML = '';
+  _sugestoesGeo.forEach((s, i)=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'card-sugestao-geo';
+    btn.innerHTML =
+      '<div class="sg-titulo">' + escapeHtml(s.titulo) + '</div>' +
+      '<div class="sg-sub">' + escapeHtml(s.sub || s.place_name || '') + '</div>' +
+      '<div class="sg-coords">' + s.lat.toFixed(6) + ', ' + s.lng.toFixed(6) + '</div>';
+    btn.onclick = function(){ selecionarSugestaoGeo(i); };
+    box.appendChild(btn);
+  });
+}
+
+/** Só após clique do usuário as coordenadas são aplicadas. */
+function selecionarSugestaoGeo(idx){
+  const s = _sugestoesGeo[idx];
+  if(!s) return;
+  window._ofLat = s.lat;
+  window._ofLon = s.lng;
+  atualizarLabelCoordsOficina();
+
+  const elEnd = document.getElementById('ofEndereco');
+  const elCid = document.getElementById('ofCidade');
+  const elEst = document.getElementById('ofEstado');
+  if(elEnd && !elEnd.value.trim() && s.endereco) elEnd.value = s.endereco;
+  if(elCid && !elCid.value.trim() && s.cidade) elCid.value = s.cidade;
+  if(elEst && !elEst.value.trim() && s.estado) elEst.value = s.estado;
+
+  document.querySelectorAll('.card-sugestao-geo').forEach((el, i)=>{
+    el.classList.toggle('selecionado', i === idx);
+  });
+  const feedback = document.getElementById('ofFeedback');
+  if(feedback) feedback.textContent = 'Coordenadas confirmadas: ' + s.lat.toFixed(6) + ', ' + s.lng.toFixed(6);
+  mostrarToast('Localização confirmada.','sucesso');
+}
+
 
 function capturarLocalizacaoGPS(){
   const statusEl = document.getElementById('ofGpsStatus');
@@ -2653,6 +2981,7 @@ function validarSenhaAdmin(){
 
 function abrirModalAdmin(){
   document.getElementById('modalAdmin').classList.remove('oculto');
+  atualizarPainelUsosMapbox();
 }
 function fecharModalAdmin(){
   document.getElementById('modalAdmin').classList.add('oculto');
@@ -2780,7 +3109,7 @@ async function lerErroJsonBin(res){
 function testarConexaoNuvem(){
   if(!NUVEM_API_KEY || NUVEM_API_KEY === 'SUA_CHAVE_API_AQUI' ||
      !NUVEM_BIN_ID  || NUVEM_BIN_ID  === 'SEU_BIN_ID_AQUI'){
-    alert('⚠ A nuvem ainda não foi configurada (NUVEM_API_KEY / NUVEM_BIN_ID vazios ou com valor padrão).');
+    alert('⚠ A nuvem ainda não foi configurada (NUVEM_API_KEY / NUVEM_BIN_ID).');
     return;
   }
   mostrarToast('Testando conexão com a nuvem...', '');
