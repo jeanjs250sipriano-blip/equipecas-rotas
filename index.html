@@ -536,6 +536,23 @@ body.modo-desktop #topbar{
   border-bottom:1px solid var(--borda);
 }
 
+
+.linha-coords-oficina{
+  display:flex; align-items:center; gap:6px;
+  margin-top:10px; padding:10px 12px;
+  background:rgba(22,163,74,.08);
+  border:1px solid rgba(22,163,74,.25);
+  border-radius:12px;
+}
+.linha-coords-oficina.oculto{ display:none !important; }
+.coords-texto{
+  flex:1; min-width:0;
+  font-size:13.5px; font-weight:600;
+  font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+  color:var(--texto); letter-spacing:-.01em;
+  word-break:break-all;
+}
+
 </style>
 
 </head>
@@ -737,8 +754,9 @@ body.modo-desktop #topbar{
           <button type="button" class="btn-voz" data-campo="ofGeoBusca" title="Ditar por voz" aria-label="Ditar por voz" onclick="iniciarDitacao('ofGeoBusca')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></button>
         </div>
         <div id="listaSugestoesGeo" class="lista-sugestoes-geo" aria-live="polite"></div>
-        <div style="display:flex; align-items:center; justify-content:flex-end; min-height:0; margin-top:4px;">
-          <button type="button" id="btnLimparCoordsX" class="btn-limpar-coords oculto" onclick="limparCoordsOficina()" title="Limpar coordenadas" aria-label="Limpar coordenadas">
+        <div id="linhaCoordsOficina" class="linha-coords-oficina oculto">
+          <span id="ofCoordsLabel" class="coords-texto"></span>
+          <button type="button" id="btnLimparCoordsX" class="btn-limpar-coords" onclick="limparCoordsOficina()" title="Limpar coordenadas" aria-label="Limpar coordenadas">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
         </div>
@@ -2841,7 +2859,8 @@ function novaOficinaForm(){
   fotoFormPendente = null;
   document.getElementById('tituloFormOficina').textContent='Nova oficina';
   ['ofNome','ofEndereco','ofCidade','ofMapsLink','ofGeoBusca'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-  const _bx=document.getElementById('btnLimparCoordsX'); if(_bx) _bx.classList.add('oculto');
+  const _ln=document.getElementById('linhaCoordsOficina'); if(_ln) _ln.classList.add('oculto');
+  const _cl=document.getElementById('ofCoordsLabel'); if(_cl) _cl.textContent='';
   document.getElementById('ofFotoPreview').innerHTML='Nenhuma<br>foto';
   document.getElementById('btnVerFoto').disabled=true;
   document.getElementById('ofVerificada').checked=false;
@@ -2883,9 +2902,18 @@ function preencherFormOficina(id){
 }
 
 function atualizarLabelCoordsOficina(){
-  const btnX = document.getElementById('btnLimparCoordsX');
+  const linha = document.getElementById('linhaCoordsOficina');
+  const el = document.getElementById('ofCoordsLabel');
   const tem = window._ofLat!=null && window._ofLon!=null;
-  if(btnX) btnX.classList.toggle('oculto', !tem);
+  if(el && tem){
+    el.textContent = (+window._ofLat).toFixed(6) + ', ' + (+window._ofLon).toFixed(6);
+  }
+  if(linha) linha.classList.toggle('oculto', !tem);
+  // limpa mensagens longas de status quando há coordenada
+  if(tem){
+    const gps = document.getElementById('ofGpsStatus');
+    if(gps) gps.textContent = '';
+  }
 }
 /** Compat: mantido caso algum trecho antigo chame ao colar. Preferir extrairCoordsDoLinkOficina(). */
 function aoColarLinkOficina(texto){
@@ -3108,10 +3136,9 @@ function capturarLocalizacaoGPS(){
     (pos)=>{
       window._ofLat = pos.coords.latitude;
       window._ofLon = pos.coords.longitude;
+      if(statusEl) statusEl.textContent = '';
       atualizarLabelCoordsOficina();
-      const precisao = pos.coords.accuracy!=null ? ` (precisão de ${Math.round(pos.coords.accuracy)} m)` : '';
-      statusEl.textContent = `Localização GPS capturada com sucesso${precisao}.`;
-      mostrarToast('Posição via GPS capturada.','sucesso');
+      mostrarToast('Coordenadas definidas via GPS.','sucesso');
     },
     (erro)=>{
       let msg = 'Não foi possível obter a localização via GPS.';
