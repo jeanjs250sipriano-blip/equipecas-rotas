@@ -1233,21 +1233,21 @@ function aplicarDados(dados){
   return true;
 }
 
-/** Envia os dados para a nuvem em segundo plano (debounce 2s). */
-function backupAutomaticoNuvem(){
+/** Salva no localStorage deste dispositivo (oficinas + rotas locais). NÃO publica na nuvem. */
+/** Publica SOMENTE o cadastro de oficinas na nuvem (nunca rotas).
+ *  Rotas são privadas por dispositivo. Só chamar após senha admin (3003). */
+function publicarOficinasNaNuvem(mostrarFeedback){
   if(!NUVEM_API_KEY || NUVEM_API_KEY === 'SUA_CHAVE_API_AQUI' ||
      !NUVEM_BIN_ID  || NUVEM_BIN_ID  === 'SEU_BIN_ID_AQUI'){
+    if(mostrarFeedback) mostrarToast('⚠ Nuvem não configurada.','erro');
     return;
   }
   clearTimeout(timerBackupNuvem);
   timerBackupNuvem = setTimeout(()=>{
     const payload = {
       proximoIdOficina,
-      proximoIdRota,
-      // Remove fotos (base64) do envio automático para não estourar o limite
-      // de tamanho do plano gratuito da JSONBin (100KB por Bin).
       oficinas: oficinas.map(({fotoDataUrl, ...resto})=>resto),
-      rotas,
+      rotas: [],
       salvo_em: new Date().toISOString()
     };
     fetch(`https://api.jsonbin.io/v3/b/${NUVEM_BIN_ID}`, {
@@ -1262,12 +1262,20 @@ function backupAutomaticoNuvem(){
       if(!res.ok) throw new Error(await lerErroJsonBin(res));
       return res.json();
     })
-    .then(() => console.log('Backup automático em nuvem concluído!'))
-    .catch(err => console.error('Erro no backup automático em nuvem:', err.message));
-  }, 2000);
+    .then(() => {
+      console.log('Cadastro de oficinas publicado na nuvem.');
+      if(mostrarFeedback) mostrarToast('Cadastro de oficinas publicado na nuvem.','sucesso');
+    })
+    .catch(err => {
+      console.error('Erro ao publicar oficinas na nuvem:', err.message);
+      if(mostrarFeedback) mostrarToast('⚠ Falha ao publicar na nuvem: ' + err.message, 'erro');
+    });
+  }, 400);
 }
 
-/** Salva no localStorage e dispara backup em nuvem. */
+/** Compat: não publica mais automaticamente. */
+function backupAutomaticoNuvem(){ /* no-op de segurança */ }
+
 function salvarEstado(){
   try{
     const payload = {
@@ -1288,7 +1296,6 @@ function salvarEstado(){
     } else {
       localStorage.setItem(CHAVE_STORAGE, bruto);
     }
-    backupAutomaticoNuvem();
   }catch(e){
     console.error('Erro ao salvar dados localmente:', e);
     // QuotaExceeded: tenta de novo sem fotos
@@ -1320,6 +1327,26 @@ function carregarEstado(){
 }
 
 /** Tenta restaurar da nuvem (usado na abertura do app). */
+/** Aplica apenas oficinas da nuvem; preserva rotas deste dispositivo. */
+function aplicarOficinasDaNuvem(dados){
+  if(!dados || !Array.isArray(dados.oficinas)) return false;
+  const rotasLocais = rotas;
+  const proxRotaLocal = proximoIdRota;
+  const listaOf = dados.oficinas.map(normalizarOficina).filter(Boolean);
+  const chave = o => JSON.stringify({id:o.id,nome:o.nome,deletada:!!o.deletada,verificada:!!o.verificada,lat:o.lat,lng:o.lng,endereco:o.endereco,cidade:o.cidade});
+  const antes = oficinas.map(chave).join('|');
+  const depois = listaOf.map(chave).join('|');
+  oficinas = listaOf;
+  const maiorIdOficina = oficinas.reduce((m,o)=>Math.max(m, o.id||0), 0);
+  proximoIdOficina = Number.isFinite(dados.proximoIdOficina)
+    ? Math.max(+dados.proximoIdOficina, maiorIdOficina + 1)
+    : (maiorIdOficina + 1);
+  rotas = Array.isArray(rotasLocais) ? rotasLocais : [];
+  proximoIdRota = proxRotaLocal;
+  return antes !== depois;
+}
+
+/** Baixa oficinas da nuvem (atualização automática). Rotas locais intactas. */
 function restaurarDaNuvem(){
   if(!NUVEM_API_KEY || NUVEM_API_KEY === 'SUA_CHAVE_API_AQUI' ||
      !NUVEM_BIN_ID  || NUVEM_BIN_ID  === 'SEU_BIN_ID_AQUI'){
@@ -1336,30 +1363,15 @@ function restaurarDaNuvem(){
   .then(json => {
     const dados = json && json.record ? json.record : json;
     if(!dados || !Array.isArray(dados.oficinas)) return false;
-
-    // Usa nuvem se local estiver vazio OU se a nuvem for mais recente
-    let localTs = null;
+    const mudou = aplicarOficinasDaNuvem(dados);
     try{
-      const bruto = localStorage.getItem(CHAVE_STORAGE);
-      if(bruto) localTs = JSON.parse(bruto).salvo_em || null;
+      localStorage.setItem(CHAVE_STORAGE, JSON.stringify({
+        proximoIdOficina, proximoIdRota, oficinas, rotas,
+        salvo_em: new Date().toISOString()
+      }));
     }catch(_){}
-
-    const nuvemMaisRecente = !localTs || (dados.salvo_em && dados.salvo_em > localTs);
-    const localVazio = oficinas.length === 0;
-
-    if(localVazio || nuvemMaisRecente){
-      aplicarDados(dados);
-      // Grava local sem reenviar para a nuvem imediatamente
-      try{
-        localStorage.setItem(CHAVE_STORAGE, JSON.stringify({
-          proximoIdOficina, proximoIdRota, oficinas, rotas,
-          salvo_em: dados.salvo_em || new Date().toISOString()
-        }));
-      }catch(_){}
-      console.log('Dados restaurados da nuvem.');
-      return true;
-    }
-    return false;
+    if(mudou) console.log('Oficinas atualizadas pela nuvem (rotas locais preservadas).');
+    return mudou;
   })
   .catch(err => {
     console.warn('Não foi possível restaurar da nuvem:', err);
@@ -2846,14 +2858,17 @@ function editarOficina(id){
 
 function excluirOficinaDireto(id, nome){
   if(!confirm(`Mover "${nome}" para a lixeira?\n\nVocê pode restaurá-la depois em Oficinas → Lixeira.`)) return;
-  const of = oficinas.find(o=>o.id===id);
-  if(!of) return;
-  of.deletada = true;
-  rotas.forEach(r=> r.oficinaIds = r.oficinaIds.filter(oid=>oid!==id));
-  salvarEstado();
-  recalcularOrdemPorDistancia();
-  renderListaOficinas(false);
-  mostrarToast('Oficina movida para a lixeira.','sucesso');
+  exigirSenhaAdmin(function(){
+    const of = oficinas.find(o=>o.id===id);
+    if(!of) return;
+    of.deletada = true;
+    rotas.forEach(r=> r.oficinaIds = r.oficinaIds.filter(oid=>oid!==id));
+    salvarEstado();
+    publicarOficinasNaNuvem(true);
+    recalcularOrdemPorDistancia();
+    renderListaOficinas(false);
+    mostrarToast('Oficina movida para a lixeira e cadastro atualizado.','sucesso');
+  });
 }
 
 function novaOficinaForm(){
@@ -3291,19 +3306,23 @@ function salvarOficina(){
   };
   if(fotoFormPendente) dados.fotoDataUrl = fotoFormPendente;
 
-  if(oficinaFormAtualId){
-    const of = oficinas.find(o=>o.id===oficinaFormAtualId);
-    Object.assign(of, dados);
-  } else {
-    oficinaFormAtualId = proximoIdOficina++;
-    oficinas.push({id:oficinaFormAtualId, fotoDataUrl:null, deletada:false, telefone:null, estado:null, ...dados});
-  }
-  fotoFormPendente = null;
-  document.getElementById('ofFeedback').textContent='Oficina salva.';
-  salvarEstado();
-  recalcularOrdemPorDistancia();
-  mostrarToast('Oficina salva com sucesso.','sucesso');
-  voltar();
+  // Publicar no cadastro compartilhado exige senha mestra 3003
+  exigirSenhaAdmin(function(){
+    if(oficinaFormAtualId){
+      const of = oficinas.find(o=>o.id===oficinaFormAtualId);
+      if(of) Object.assign(of, dados);
+    } else {
+      oficinaFormAtualId = proximoIdOficina++;
+      oficinas.push({id:oficinaFormAtualId, fotoDataUrl:null, deletada:false, telefone:null, estado:null, ...dados});
+    }
+    fotoFormPendente = null;
+    document.getElementById('ofFeedback').textContent='Oficina salva.';
+    salvarEstado();
+    publicarOficinasNaNuvem(true);
+    recalcularOrdemPorDistancia();
+    mostrarToast('Oficina salva e publicada no cadastro.','sucesso');
+    voltar();
+  });
 }
 
 /* =========================================================================
@@ -3405,23 +3424,35 @@ function validarSenhaModoUI(){
 
 const SENHA_ADMIN = '3003';
 let _arquivoRestaurarDados = null;
+/** Callback após senha correta; null = abrir painel admin. */
+let _posSenhaAdminCb = null;
 
-function abrirModalSenha(){
+function abrirModalSenha(callback){
+  _posSenhaAdminCb = (typeof callback === 'function') ? callback : null;
   document.getElementById('inputSenhaAdmin').value = '';
   document.getElementById('modalSenha').classList.remove('oculto');
   setTimeout(()=>{ document.getElementById('inputSenhaAdmin').focus(); }, 50);
 }
 function fecharModalSenha(){
   document.getElementById('modalSenha').classList.add('oculto');
+  _posSenhaAdminCb = null;
 }
 function validarSenhaAdmin(){
   const valor = document.getElementById('inputSenhaAdmin').value;
   if(valor === SENHA_ADMIN){
-    fecharModalSenha();
-    abrirModalAdmin();
+    const cb = _posSenhaAdminCb;
+    _posSenhaAdminCb = null;
+    document.getElementById('modalSenha').classList.add('oculto');
+    if(cb) cb();
+    else abrirModalAdmin();
   } else {
     alert('Senha incorreta.');
   }
+}
+
+/** Exige senha 3003 e executa a ação. */
+function exigirSenhaAdmin(acao){
+  abrirModalSenha(acao);
 }
 
 function abrirModalAdmin(){
@@ -3521,6 +3552,7 @@ function restaurarMesclarNovos(){
 function finalizarRestauracao(mensagem){
   fecharModalRestaurarOpcoes();
   salvarEstado();
+  publicarOficinasNaNuvem(true);
   recalcularOrdemPorDistancia();
   atualizarLauncher();
   const pg = document.querySelector('.pagina.ativa');
@@ -3594,8 +3626,10 @@ function gerarPublicarBackupOficial(){
     // de tamanho do plano gratuito da JSONBin (100KB por Bin). As fotos continuam
     // salvas normalmente no dispositivo e no arquivo de download local.
     const payloadNuvem = {
-      ...payload,
-      oficinas: oficinas.map(({fotoDataUrl, ...resto})=>resto)
+      proximoIdOficina,
+      oficinas: oficinas.map(({fotoDataUrl, ...resto})=>resto),
+      rotas: [],
+      salvo_em: payload.salvo_em
     };
     const corpoNuvem = JSON.stringify(payloadNuvem);
     const tamanhoKB = (new Blob([corpoNuvem]).size / 1024);
@@ -3684,15 +3718,18 @@ function alternarSelecionarTodasLixeira(checkbox){
 }
 
 function restaurarOficina(id){
-  const of = oficinas.find(o=>o.id===id);
-  if(!of) return;
-  of.deletada = false;
-  salvarEstado();
-  recalcularOrdemPorDistancia();
-  renderListaLixeira();
-  renderListaOficinas(false);
-  atualizarLauncher();
-  mostrarToast('Oficina restaurada.','sucesso');
+  exigirSenhaAdmin(function(){
+    const of = oficinas.find(o=>o.id===id);
+    if(!of) return;
+    of.deletada = false;
+    salvarEstado();
+    publicarOficinasNaNuvem(true);
+    recalcularOrdemPorDistancia();
+    renderListaLixeira();
+    renderListaOficinas(false);
+    atualizarLauncher();
+    mostrarToast('Oficina restaurada e publicada.','sucesso');
+  });
 }
 
 function restaurarSelecionadasLixeira(){
@@ -3704,16 +3741,19 @@ function restaurarSelecionadasLixeira(){
     mostrarToast('Selecione ao menos uma oficina para restaurar.','erro');
     return;
   }
-  marcadas.forEach(id=>{
-    const of = oficinas.find(o=>o.id===id);
-    if(of) of.deletada = false;
+  exigirSenhaAdmin(function(){
+    marcadas.forEach(id=>{
+      const of = oficinas.find(o=>o.id===id);
+      if(of) of.deletada = false;
+    });
+    salvarEstado();
+    publicarOficinasNaNuvem(true);
+    recalcularOrdemPorDistancia();
+    renderListaLixeira();
+    renderListaOficinas(false);
+    atualizarLauncher();
+    mostrarToast(marcadas.length + ' oficina(s) restaurada(s) e publicadas.','sucesso');
   });
-  salvarEstado();
-  recalcularOrdemPorDistancia();
-  renderListaLixeira();
-  renderListaOficinas(false);
-  atualizarLauncher();
-  mostrarToast(`${marcadas.length} oficina(s) restaurada(s).`,'sucesso');
 }
 
 /* =========================================================================
